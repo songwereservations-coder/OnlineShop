@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanzania Digital Market Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-store text-2xl text-yellow-400"></i>
+                <span class="text-xl font-bold tracking-wide">Tanzania Market Hub</span>
+            </div>
+            <div class="space-x-4">
+                <button onclick="openModal('businessModal')" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-4 py-2 rounded-lg shadow transition">
+                    <i class="fa-solid fa-briefcase mr-2"></i>Register Business
+                </button>
+                <button onclick="openModal('cartModal')" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg relative transition">
+                    <i class="fa-solid fa-cart-shopping"></i> Cart 
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+        
+        <!-- 7. Side Sort / Category Filter Sidebar -->
+        <aside class="w-full md:w-1/4 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
+            <h3 class="text-lg font-bold mb-4 text-gray-900 border-b pb-2 flex items-center">
+                <i class="fa-solid fa-filter text-blue-900 mr-2"></i> Categories
+            </h3>
+            <div id="categoryList" class="flex flex-col space-y-2">
+                <button onclick="filterCategory('All')" class="category-btn text-left px-3 py-2 rounded-lg bg-blue-50 text-blue-900 font-semibold transition">All Categories</button>
+                <button onclick="filterCategory('Hospitality & Lodging')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Hospitality & Lodging</button>
+                <button onclick="filterCategory('Agriculture & Food')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Agriculture & Food</button>
+                <button onclick="filterCategory('Retail & Electronics')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Retail & Electronics</button>
+                <button onclick="filterCategory('Crafts & Services')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Crafts & Services</button>
+            </div>
+
+            <div class="mt-8 border-t pt-4">
+                <h4 class="font-semibold text-sm text-gray-500 mb-2">Registered Hub Businesses</h4>
+                <div id="hubBusinessList" class="text-sm space-y-1 text-gray-600 max-h-48 overflow-y-auto">
+                    <!-- Dynamic List of Active Businesses -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Product & Marketplace Grid -->
+        <main class="w-full md:w-3/4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="currentCategoryTitle" class="text-2xl font-bold text-gray-900">Explore Marketplace</h2>
+                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search products or businesses..." class="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically Populated Products -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal 1: Register Business (Steps 1, 2, 4, 5) -->
+    <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-10">
+        <div class="bg-white p-8 rounded-xl max-w-lg w-full relative">
+            <button onclick="closeModal('businessModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-blue-900"><i class="fa-solid fa-store mr-2"></i>Register Business & Products</h3>
+            
+            <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Business Name</label>
+                    <input type="text" id="bizName" required class="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                    <select id="bizCategory" class="w-full mt-1 px-3 py-2 border rounded-lg">
+                        <option value="Hospitality & Lodging">Hospitality & Lodging</option>
+                        <option value="Agriculture & Food">Agriculture & Food</option>
+                        <option value="Retail & Electronics">Retail & Electronics</option>
+                        <option value="Crafts & Services">Crafts & Services</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Business Image URL (Logo / Photo)</label>
+                    <input type="url" id="bizImage" placeholder="https://example.com/image.jpg" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                </div>
+
+                <hr class="my-2">
+                <h4 class="font-semibold text-gray-800">First Product Details</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Product Name</label>
+                        <input type="text" id="prodName" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Price (TZS)</label>
+                        <input type="number" id="prodPrice" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Product Image URL</label>
+                    <input type="url" id="prodImage" placeholder="https://example.com/product.jpg" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                </div>
+
+                <!-- 5. Delivery Options Setup -->
+                <div class="bg-gray-50 p-3 rounded-lg border">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="deliveryToggle" onchange="toggleDeliveryInputs()" class="rounded text-blue-600">
+                        <span class="font-medium text-sm text-gray-700">Enable Delivery Service</span>
+                    </label>
+                    <div id="deliveryConfig" class="hidden mt-3 space-y-2">
+                        <input type="text" id="deliveryLocation" placeholder="Servicing Location / Region (e.g., Dar es Salaam)" class="w-full text-sm px-3 py-1 border rounded">
+                        <input type="number" id="deliveryCost" placeholder="Flat Delivery Cost (TZS)" class="w-full text-sm px-3 py-1 border rounded">
+                    </div>
+                </div>
+
+                <!-- 2. Payment verification simulation for hub entry -->
+                <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 text-sm text-yellow-800">
+                    <p class="font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Hub Listing Fee Required</p>
+                    <p class="text-xs mt-1">A verification fee of 5,000 TZS must be paid via M-Pesa (Lipa namba) or CRDB before approval into the market hub.</p>
+                    <select id="regPaymentMethod" class="w-full mt-2 text-xs px-2 py-1 border rounded bg-white">
+                        <option value="M-Pesa">M-Pesa (Vodacom)</option>
+                        <option value="CRDB">CRDB Bank (Account Transfer)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2 rounded-lg transition">Submit & Pay Hub Fee</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Cart & Checkout via Formspree (Steps 3 & 6) -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-10">
+        <div class="bg-white p-8 rounded-xl max-w-lg w-full relative">
+            <button onclick="closeModal('cartModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-xl font-bold mb-4 text-blue-900"><i class="fa-solid fa-cart-shopping mr-2"></i>Checkout & Payment</h3>
+            
+            <div id="cartItemsList" class="space-y-3 max-h-48 overflow-y-auto mb-4 border-b pb-4">
+                <!-- Cart products go here -->
+            </div>
+
+            <!-- 6. Formspree Form Submission -->
+            <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST" class="space-y-4" onsubmit="handleCheckout(event)">
+                <input type="hidden" name="order_details" id="formspreeOrderDetails">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Customer Name</label>
+                    <input type="text" name="customer_name" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Phone Number / Contact</label>
+                    <input type="text" name="phone" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                </div>
+                
+                <!-- 3. Payment Option Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Select Payment Gateway</label>
+                    <select name="payment_method" id="paymentMethod" onchange="updatePaymentInstructions()" class="w-full mt-1 px-3 py-2 border rounded-lg">
+                        <option value="M-Pesa">M-Pesa (Vodacom / Mobile Money)</option>
+                        <option value="CRDB">CRDB Bank</option>
+                    </select>
+                </div>
+
+                <div id="paymentInstructions" class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800">
+                    Send money via M-Pesa to <strong>+255 700 000 000</strong> and enter transaction code below.
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Bank / Transaction Reference Code</label>
+                    <input type="text" name="transaction_code" required placeholder="e.g., 8H73K29PL" class="w-full mt-1 px-3 py-2 border rounded-lg">
+                </div>
+
+                <div class="flex justify-between font-bold text-lg pt-2 border-t">
+                    <span>Total:</span>
+                    <span id="cartTotalPrice">TZS 0</span>
+                </div>
+
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition">Complete Order & Send</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initial Database Mock Data (Demonstrating Market Hub sorting & listing)
+        let marketplaceData = [
+            {
+                id: 1,
+                businessName: "Majimoto Safari Lodge",
+                category: "Hospitality & Lodging",
+                bizImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400",
+                productName: "Luxury Safari Tent",
+                price: 150000,
+                prodImage: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=400",
+                deliveryAvailable: true,
+                deliveryLocation: "Songwe & Mbeya Region",
+                deliveryCost: 10000
+            },
+            {
+                id: 2,
+                businessName: "Enrich Agro Hub",
+                category: "Agriculture & Food",
+                bizImage: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400",
+                productName: "Organic Sunflower Oil (5L)",
+                price: 25000,
+                prodImage: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400",
+                deliveryAvailable: true,
+                deliveryLocation: "Dar es Salaam & Arusha",
+                deliveryCost: 5000
+            }
+        ];
+
+        let cart = [];
+        let currentFilter = 'All';
+
+        // Initialize UI
+        window.onload = function() {
+            renderProducts();
+            renderHubBusinesses();
+        };
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function toggleDeliveryInputs() {
+            const toggle = document.getElementById('deliveryToggle');
+            const config = document.getElementById('deliveryConfig');
+            if (toggle.checked) {
+                config.classList.remove('hidden');
+            } else {
+                config.classList.add('hidden');
+            }
+        }
+
+        // 1 & 2 & 4 & 5. Handle Business and Product Registration with Payment Confirmation
+        function handleBusinessRegistration(event) {
+            event.preventDefault();
+            const bizName = document.getElementById('bizName').value;
+            const category = document.getElementById('bizCategory').value;
+            const bizImage = document.getElementById('bizImage').value;
+            const prodName = document.getElementById('prodName').value;
+            const prodPrice = parseFloat(document.getElementById('prodPrice').value);
+            const prodImage = document.getElementById('prodImage').value;
+            
+            const deliveryAvailable = document.getElementById('deliveryToggle').checked;
+            const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
+            const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
+            const paymentMethod = document.getElementById('regPaymentMethod').value;
+
+            // Confirm payment validation simulation
+            alert(`Business listing registration fee verified successfully via ${paymentMethod}! Business "${bizName}" is now confirmed in the hub.`);
+
+            const newEntry = {
+                id: Date.now(),
+                businessName: bizName,
+                category: category,
+                bizImage: bizImage,
+                productName: prodName,
+                price: prodPrice,
+                prodImage: prodImage,
+                deliveryAvailable: deliveryAvailable,
+                deliveryLocation: deliveryLocation,
+                deliveryCost: deliveryCost
+            };
+
+            marketplaceData.push(newEntry);
+            document.getElementById('businessForm').reset();
+            closeModal('businessModal');
+            renderProducts();
+            renderHubBusinesses();
+        }
+
+        // 7. Side Sort / Category Filter Logic
+        function filterCategory(category) {
+            currentFilter = category;
+            document.getElementById('currentCategoryTitle').innerText = category === 'All' ? 'Explore Marketplace' : category;
+            
+            // Highlight active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-blue-900', 'font-semibold');
+                btn.classList.add('hover:bg-gray-100', 'text-gray-700');
+                if (btn.innerText.includes(category)) {
+                    btn.classList.add('bg-blue-50', 'text-blue-900', 'font-semibold');
+                    btn.classList.remove('hover:bg-gray-100', 'text-gray-700');
+                }
+            });
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'All' 
+                ? marketplaceData 
+                : marketplaceData.filter(item => item.category === currentFilter);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-8">No commodities found in this category.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+                        <div>
+                            <div class="relative h-48 bg-gray-200">
+                                <img src="${item.prodImage}" alt="${item.productName}" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 bg-blue-900 text-white text-xs px-2.5 py-1 rounded-full">${item.category}</span>
+                            </div>
+                            <div class="p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <img src="${item.bizImage}" class="w-6 h-6 rounded-full object-cover border">
+                                    <span class="text-xs text-gray-600 font-medium">${item.businessName}</span>
+                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg mb-1">${item.productName}</h3>
+                                <p class="text-blue-900 font-bold mb-2">TZS ${item.price.toLocaleString()}</p>
+                                ${item.deliveryAvailable ? `<p class="text-xs text-green-600 font-medium mb-3"><i class="fa-solid fa-truck-fast mr-1"></i> Delivery available in ${item.deliveryLocation} (+TZS ${item.deliveryCost.toLocaleString()})</p>` : `<p class="text-xs text-gray-400 mb-3">Pickup only</p>`}
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold py-2 rounded-lg transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Add to Selection
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderHubBusinesses() {
+            const listContainer = document.getElementById('hubBusinessList');
+            listContainer.innerHTML = '';
+            const uniqueBusinesses = [...new Set(marketplaceData.map(item => item.businessName))];
+            uniqueBusinesses.forEach(biz => {
+                listContainer.innerHTML += `<div class="truncate">• ${biz}</div>`;
+            });
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            const results = marketplaceData.filter(item => 
+                item.productName.toLowerCase().includes(query) || 
+                item.businessName.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-8">No results match your search.</p>`;
+                return;
+            }
+
+            results.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 bg-gray-200">
+                                <img src="${item.prodImage}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-4">
+                                <p class="text-xs text-gray-500">${item.businessName}</p>
+                                <h3 class="font-bold text-gray-900 text-lg">${item.productName}</h3>
+                                <p class="text-blue-900 font-bold">TZS ${item.price.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-sm font-semibold py-2 rounded-lg">Add to Selection</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(id) {
+            const product = marketplaceData.find(i => i.id === id);
+            cart.push(product);
+            document.getElementById('cartCount').innerText = cart.length;
+            updateCartModal();
+            openModal('cartModal');
+        }
+
+        function updateCartModal() {
+            const container = document.getElementById('cartItemsList');
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center">Your selection is empty.</p>`;
+                document.getElementById('cartTotalPrice').innerText = 'TZS 0';
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                total += item.price;
+                container.innerHTML += `
+                    <div class="flex justify-between items-center text-sm">
+                        <div>
+                            <p class="font-semibold">${item.productName}</p>
+                            <p class="text-xs text-gray-500">${item.businessName}</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span>TZS ${item.price.toLocaleString()}</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cartTotalPrice').innerText = `TZS ${total.toLocaleString()}`;
+            document.getElementById('formspreeOrderDetails').value = JSON.stringify(cart);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            document.getElementById('cartCount').innerText = cart.length;
+            updateCartModal();
+        }
+
+        // 3. Payment Instructions Switcher (M-Pesa vs CRDB)
+        function updatePaymentInstructions() {
+            const method = document.getElementById('paymentMethod').value;
+            const infoBox = document.getElementById('paymentInstructions');
+            if (method === 'M-Pesa') {
+                infoBox.innerHTML = `Send money via M-Pesa to Lipa namba <strong>5544332 - Tanzania Market Hub</strong> and enter your confirmation SMS code below.`;
+            } else {
+                infoBox.innerHTML = `Transfer funds to <strong>CRDB Bank Account: 0150XXXXXXXXX00</strong> (Tanzania Market Hub) and enter your bank reference receipt code below.`;
+            }
+        }
+
+        function handleCheckout(event) {
+            // Formspree handles the POST natively. This function clears the cart after submission.
+            setTimeout(() => {
+                alert('Order successfully submitted to Formspree and sent to hub management!');
+                cart = [];
+                document.getElementById('cartCount').innerText = 0;
+                closeModal('cartModal');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
