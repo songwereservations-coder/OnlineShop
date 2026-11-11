@@ -300,7 +300,7 @@
                     <span>Total:</span>
                     <span id="cartTotalPrice">TZS 0</span>
                 </div>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 rounded transition">Complete Order</button>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 rounded transition">Purchase</button>
             </form>
         </div>
     </div>
@@ -609,7 +609,8 @@
                 grid.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-36 bg-gray-200 overflow-hidden">
+                            <!-- Product Image Carousel (Square Shape) -->
+                            <div class="relative aspect-square bg-gray-100 overflow-hidden rounded-t-lg">
                                 <div id="carousel-${item.uniqueKey}" data-index="0" class="flex transition-transform duration-300 w-full h-full">
                                     ${imagesHtml}
                                 </div>
@@ -632,11 +633,8 @@
                             </div>
                         </div>
                         <div class="p-2.5 pt-0 flex gap-1.5">
-                            <button onclick="addToCart(${item.id})" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-semibold py-1 rounded transition">
-                                <i class="fa-solid fa-cart-plus mr-1"></i> Add
-                            </button>
-                            <button onclick="openAddProductModal('${item.docId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-[11px] px-2 py-1 rounded transition" title="Add another product">
-                                <i class="fa-solid fa-plus"></i>
+                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-semibold py-1.5 rounded transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Add to Selection
                             </button>
                         </div>
                     </div>
@@ -680,7 +678,7 @@
                 grid.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-36 bg-gray-200"><img src="${item.prodImages[0]}" class="w-full h-full object-cover"></div>
+                            <div class="relative aspect-square bg-gray-100"><img src="${item.prodImages[0]}" class="w-full h-full object-cover"></div>
                             <div class="p-2.5">
                                 <p class="text-[10px] text-gray-500">${item.businessName}</p>
                                 <h3 class="font-bold text-gray-900 text-xs">${item.productName}</h3>
@@ -688,7 +686,7 @@
                                 <p class="text-blue-900 font-bold text-xs">TZS ${item.price.toLocaleString()}</p>
                             </div>
                         </div>
-                        <div class="p-2.5 pt-0"><button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-[11px] font-semibold py-1 rounded">Add to Selection</button></div>
+                        <div class="p-2.5 pt-0"><button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-[11px] font-semibold py-1.5 rounded">Add to Selection</button></div>
                     </div>
                 `;
             });
