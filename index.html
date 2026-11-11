@@ -13,7 +13,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // TODO: Replace with your actual Firebase project configuration keys
         const firebaseConfig = {
             apiKey: "AIzaSyDIzpHktpyEYZwxYFL6ekAcUIOSKdWEGbU",
             authDomain: "songwe-online-shop.firebaseapp.com",
@@ -26,7 +25,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Expose Firebase functions globally for the app script
         window.db = db;
         window.collection = collection;
         window.addDoc = addDoc;
@@ -35,7 +33,6 @@
         window.deleteDoc = deleteDoc;
         window.doc = doc;
 
-        // Load data from Firestore on startup
         window.onload = function() {
             loadMarketplaceFromFirestore();
         };
@@ -45,198 +42,196 @@
 
     <!-- Top Navigation Bar -->
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+        <div class="container mx-auto px-4 py-2.5 flex flex-col sm:flex-row justify-between items-center gap-1.5">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-store text-xl text-yellow-400"></i>
+                <i class="fa-solid fa-store text-lg text-yellow-400"></i>
                 <div>
-                    <span class="text-lg font-bold tracking-wide">Songwe Online Shop</span>
-                    <p class="text-[10px] text-yellow-300 font-medium">Servicing: Mlowo, Vwawa, Tunduma, Karasha, Mpemba, Mahenje, Ileje</p>
+                    <span class="text-base font-bold tracking-wide">Songwe Online Shop</span>
+                    <p class="text-[9px] text-yellow-300 font-medium">Servicing: Mlowo, Vwawa, Tunduma, Karasha, Mpemba, Mahenje, Ileje</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="openModal('businessModal')" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-3 py-1.5 rounded text-xs shadow transition">
+                <button onclick="openModal('businessModal')" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-2.5 py-1 rounded text-[11px] shadow transition">
                     <i class="fa-solid fa-briefcase mr-1"></i>Register Business
                 </button>
-                <button onclick="openModal('adminModal')" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold px-3 py-1.5 rounded text-xs transition">
+                <button onclick="openModal('adminModal')" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold px-2.5 py-1 rounded text-[11px] transition">
                     <i class="fa-solid fa-lock mr-1"></i>Admin Portal
                 </button>
-                <button onclick="openModal('cartModal')" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-xs relative transition">
+                <button onclick="openModal('cartModal')" class="bg-blue-700 hover:bg-blue-800 px-2.5 py-1 rounded text-[11px] relative transition">
                     <i class="fa-solid fa-cart-shopping"></i> 
-                    <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">0</span>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] rounded-full h-3.5 w-3.5 flex items-center justify-center">0</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content Layout -->
-    <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
+    <div class="container mx-auto px-4 py-5 flex flex-col md:flex-row gap-5">
         
         <!-- Side Sort / Category Filter Sidebar -->
-        <aside class="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 h-fit">
-            <div class="flex justify-between items-center mb-3 border-b pb-2">
-                <h3 class="font-bold text-gray-900 text-sm flex items-center">
-                    <i class="fa-solid fa-filter text-blue-900 mr-2"></i> Categories
+        <aside class="w-full md:w-1/4 bg-white p-3.5 rounded-lg shadow-sm border border-gray-100 h-fit">
+            <div class="flex justify-between items-center mb-2.5 border-b pb-1.5">
+                <h3 class="font-bold text-gray-900 text-xs flex items-center">
+                    <i class="fa-solid fa-filter text-blue-900 mr-1.5"></i> Categories
                 </h3>
             </div>
-            <div id="categoryList" class="flex flex-col space-y-1 text-sm">
+            <div id="categoryList" class="flex flex-col space-y-1 text-xs">
                 <!-- Dynamic Category Buttons -->
             </div>
 
-            <div class="mt-6 border-t pt-3">
-                <h4 class="font-semibold text-xs text-gray-500 mb-2">Confirmed Hub Businesses</h4>
-                <div id="hubBusinessList" class="text-xs space-y-1 text-gray-600 max-h-40 overflow-y-auto">
-                    <!-- Dynamic List of Active Businesses -->
+            <div class="mt-5 border-t pt-2.5">
+                <h4 class="font-semibold text-[11px] text-gray-500 mb-1.5">Confirmed Hub Businesses</h4>
+                <div id="hubBusinessList" class="text-[11px] space-y-1 text-gray-600 max-h-36 overflow-y-auto">
+                    <!-- Dynamic List -->
                 </div>
             </div>
         </aside>
 
         <!-- Product & Marketplace Grid -->
         <main class="w-full md:w-3/4">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-5 gap-3">
-                <h2 id="currentCategoryTitle" class="text-xl font-bold text-gray-900">Explore Marketplace</h2>
-                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search products or businesses..." class="px-3 py-1.5 text-sm border rounded-lg w-full sm:w-1/3 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2.5">
+                <h2 id="currentCategoryTitle" class="text-lg font-bold text-gray-900">Explore Marketplace</h2>
+                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search products or businesses..." class="px-2.5 py-1 text-xs border rounded-lg w-full sm:w-1/3 focus:outline-none focus:ring-1 focus:ring-blue-500">
             </div>
 
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 <!-- Dynamically Populated Products -->
             </div>
         </main>
     </div>
 
     <!-- Floating WhatsApp Contact Button -->
-    <a href="https://wa.me/+255758216364?text=Hello,%20I%20am%20inquiring%20about%20Songwe%20Online%20Shop." target="_blank" class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white p-3.5 rounded-full shadow-lg z-40 flex items-center justify-center transition">
-        <i class="fa-brands fa-whatsapp text-2xl"></i>
+    <a href="https://wa.me/+255758216364?text=Hello,%20I%20am%20inquiring%20about%20Songwe%20Online%20Shop." target="_blank" class="fixed bottom-4 right-4 bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg z-40 flex items-center justify-center transition">
+        <i class="fa-brands fa-whatsapp text-xl"></i>
     </a>
 
-    <!-- Modal: Register / Edit Business & Products -->
-    <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-6">
-        <div class="bg-white p-6 rounded-lg max-w-md w-full relative shadow-lg">
-            <button onclick="closeModal('businessModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 id="bizModalTitle" class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-store mr-1"></i>Register Business & Products</h3>
+    <!-- Modal: Register Business & Products -->
+    <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-5">
+        <div class="bg-white p-5 rounded-lg max-w-sm w-full relative shadow-lg">
+            <button onclick="closeModal('businessModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+            <h3 class="text-sm font-bold mb-2.5 text-blue-900"><i class="fa-solid fa-store mr-1"></i>Register Business</h3>
             
-            <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-3 text-sm">
+            <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-2 text-xs">
                 <div>
-                    <label class="block text-xs font-medium text-gray-700">Business Name</label>
-                    <input type="text" id="bizName" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500">
+                    <label class="block font-medium text-gray-700">Business Name</label>
+                    <input type="text" id="bizName" required class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700">Business Description</label>
-                    <textarea id="bizDescription" rows="2" placeholder="Describe your services or offerings..." class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500"></textarea>
+                    <label class="block font-medium text-gray-700">Business Description</label>
+                    <textarea id="bizDescription" rows="1.5" placeholder="Describe your services..." class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Category</label>
-                        <select id="bizCategory" class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded bg-white">
+                        <label class="block font-medium text-gray-700">Category</label>
+                        <select id="bizCategory" class="w-full mt-0.5 px-2 py-1 border rounded bg-white">
                             <!-- Dynamic Categories -->
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Upload Business Logo</label>
-                        <input type="file" id="bizImageFile" accept="image/*" class="w-full mt-0.5 text-[11px] border rounded file:mr-2 file:py-1 file:px-2 file:border-0 file:text-[10px] file:bg-blue-50 file:text-blue-700">
+                        <label class="block font-medium text-gray-700">Upload Business Images (Multiple)</label>
+                        <input type="file" id="bizImagesFile" accept="image/*" multiple class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
                     </div>
                 </div>
 
                 <hr class="my-1">
-                <h4 class="font-semibold text-xs text-gray-800">Initial Product Details</h4>
+                <h4 class="font-semibold text-gray-800">Initial Product Details</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Product Name</label>
-                        <input type="text" id="prodName" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
+                        <label class="block font-medium text-gray-700">Product Name</label>
+                        <input type="text" id="prodName" required class="w-full mt-0.5 px-2 py-1 border rounded">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Price (TZS)</label>
-                        <input type="number" id="prodPrice" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
+                        <label class="block font-medium text-gray-700">Price (TZS)</label>
+                        <input type="number" id="prodPrice" required class="w-full mt-0.5 px-2 py-1 border rounded">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700">Product Description</label>
-                    <textarea id="prodDescription" rows="2" placeholder="Describe features or quality..." class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500"></textarea>
+                    <label class="block font-medium text-gray-700">Product Description</label>
+                    <textarea id="prodDescription" rows="1.5" placeholder="Product details..." class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700">Upload Product Image</label>
-                    <input type="file" id="prodImageFile" accept="image/*" required class="w-full mt-0.5 text-[11px] border rounded file:mr-2 file:py-1 file:px-2 file:border-0 file:text-[10px] file:bg-blue-50 file:text-blue-700">
+                    <label class="block font-medium text-gray-700">Upload Product Image</label>
+                    <input type="file" id="prodImageFile" accept="image/*" required class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
                 </div>
 
-                <div class="bg-gray-50 p-2.5 rounded border">
-                    <label class="flex items-center space-x-2 cursor-pointer">
+                <div class="bg-gray-50 p-2 rounded border">
+                    <label class="flex items-center space-x-1.5 cursor-pointer">
                         <input type="checkbox" id="deliveryToggle" onchange="toggleDeliveryInputs()" class="rounded text-blue-600">
-                        <span class="font-medium text-xs text-gray-700">Enable Delivery Service</span>
+                        <span class="font-medium text-gray-700">Enable Delivery Service</span>
                     </label>
-                    <div id="deliveryConfig" class="hidden mt-2 space-y-1.5">
-                        <input type="text" id="deliveryLocation" placeholder="Town/Region (e.g., Tunduma)" class="w-full text-xs px-2 py-1 border rounded">
-                        <input type="number" id="deliveryCost" placeholder="Delivery Cost (TZS)" class="w-full text-xs px-2 py-1 border rounded">
+                    <div id="deliveryConfig" class="hidden mt-1.5 space-y-1">
+                        <input type="text" id="deliveryLocation" placeholder="Town (e.g., Tunduma)" class="w-full px-2 py-0.5 border rounded">
+                        <input type="number" id="deliveryCost" placeholder="Delivery Cost (TZS)" class="w-full px-2 py-0.5 border rounded">
                     </div>
                 </div>
 
-                <div class="bg-yellow-50 p-2.5 rounded border border-yellow-200 text-xs text-yellow-800">
+                <div class="bg-yellow-50 p-2 rounded border border-yellow-200 text-yellow-800">
                     <p class="font-semibold">Listing Fee: 5,000 TZS</p>
-                    <p class="text-[11px] mt-0.5">Pay via M-Pesa or CRDB. Listing will go live once verified by Admin.</p>
-                    <select id="regPaymentMethod" class="w-full mt-1 text-[11px] px-2 py-1 border rounded bg-white">
+                    <select id="regPaymentMethod" class="w-full mt-1 px-1.5 py-0.5 border rounded bg-white text-[11px]">
                         <option value="M-Pesa">M-Pesa (Vodacom)</option>
                         <option value="CRDB">CRDB Bank</option>
                     </select>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition">Submit Business for Verification</button>
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition shadow">Submit Business for Verification</button>
             </form>
         </div>
     </div>
 
     <!-- Modal: Add Product to Existing Business -->
     <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-lg max-w-sm w-full relative shadow-lg">
-            <button onclick="closeModal('addProductModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-plus-circle mr-1"></i>Add Product</h3>
-            <form id="addProductForm" onsubmit="handleAdditionalProduct(event)" class="space-y-3 text-xs">
+        <div class="bg-white p-5 rounded-lg max-w-xs w-full relative shadow-lg">
+            <button onclick="closeModal('addProductModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+            <h3 class="text-sm font-bold mb-2.5 text-blue-900"><i class="fa-solid fa-plus-circle mr-1"></i>Add Product</h3>
+            <form id="addProductForm" onsubmit="handleAdditionalProduct(event)" class="space-y-2 text-xs">
                 <input type="hidden" id="addProdBizDocId">
                 <div>
                     <label class="block font-medium text-gray-700">Product Name</label>
-                    <input type="text" id="extraProdName" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                    <input type="text" id="extraProdName" required class="w-full mt-0.5 px-2 py-1 border rounded">
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Price (TZS)</label>
-                    <input type="number" id="extraProdPrice" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                    <input type="number" id="extraProdPrice" required class="w-full mt-0.5 px-2 py-1 border rounded">
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Product Description</label>
-                    <textarea id="extraProdDescription" rows="2" placeholder="Product details..." class="w-full mt-0.5 px-2.5 py-1.5 border rounded"></textarea>
+                    <textarea id="extraProdDescription" rows="1.5" placeholder="Details..." class="w-full mt-0.5 px-2 py-1 border rounded"></textarea>
                 </div>
                 <div>
-                    <label class="block font-medium text-gray-700">Upload Product Image</label>
-                    <input type="file" id="extraProdImageFile" accept="image/*" required class="w-full mt-0.5 text-[11px] border rounded file:mr-2 file:py-1 file:px-2 file:border-0 file:text-[10px] file:bg-blue-50 file:text-blue-700">
+                    <label class="block font-medium text-gray-700">Upload Image</label>
+                    <input type="file" id="extraProdImageFile" accept="image/*" required class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
                 </div>
-                <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Publish Product</button>
+                <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold transition">Publish Product</button>
             </form>
         </div>
     </div>
 
     <!-- Modal: Admin Portal -->
     <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-lg max-w-xl w-full relative shadow-lg max-h-[85vh] overflow-y-auto">
-            <button onclick="closeModal('adminModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-base font-bold mb-3 text-gray-900"><i class="fa-solid fa-lock mr-1 text-blue-900"></i>Admin Portal</h3>
+        <div class="bg-white p-5 rounded-lg max-w-lg w-full relative shadow-lg max-h-[85vh] overflow-y-auto">
+            <button onclick="closeModal('adminModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+            <h3 class="text-sm font-bold mb-2.5 text-gray-900"><i class="fa-solid fa-lock mr-1 text-blue-900"></i>Admin Portal</h3>
             
-            <div id="adminLoginBox" class="space-y-3">
-                <p class="text-xs text-gray-500">Enter admin password (Default: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
-                <input type="password" id="adminPasswordInput" placeholder="Password" class="w-full px-3 py-1.5 text-xs border rounded">
-                <button onclick="verifyAdmin()" class="w-full bg-blue-900 text-white text-xs py-1.5 rounded font-semibold">Access Admin Panel</button>
+            <div id="adminLoginBox" class="space-y-2.5 text-xs">
+                <p class="text-gray-500">Enter admin password (Default: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
+                <input type="password" id="adminPasswordInput" placeholder="Password" class="w-full px-2 py-1 border rounded">
+                <button onclick="verifyAdmin()" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Access Admin Panel</button>
             </div>
 
-            <div id="adminDashboard" class="hidden space-y-4">
-                <div class="flex justify-between items-center bg-gray-50 p-3 rounded border">
+            <div id="adminDashboard" class="hidden space-y-3 text-xs">
+                <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded border">
                     <div>
-                        <p class="text-xs font-bold text-gray-900">Category Management</p>
-                        <p class="text-[11px] text-gray-500">Add new sorting categories to the shop.</p>
+                        <p class="font-bold text-gray-900">Category Management</p>
                     </div>
-                    <div class="flex space-x-2">
-                        <input type="text" id="newCategoryName" placeholder="New Category" class="px-2 py-1 text-xs border rounded">
-                        <button onclick="addNewCategory()" class="bg-blue-900 text-white text-xs px-3 py-1 rounded font-semibold">Add</button>
+                    <div class="flex space-x-1.5">
+                        <input type="text" id="newCategoryName" placeholder="New Category" class="px-2 py-0.5 border rounded">
+                        <button onclick="addNewCategory()" class="bg-blue-900 text-white px-2.5 py-0.5 rounded font-semibold">Add</button>
                     </div>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-bold text-gray-700 mb-2">Manage & Confirm Businesses</h4>
-                    <div id="adminListContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <h4 class="font-bold text-gray-700 mb-1.5">Manage & Review Businesses</h4>
+                    <div id="adminListContainer" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                         <!-- Dynamic Admin Listing Cards -->
                     </div>
                 </div>
@@ -244,57 +239,67 @@
         </div>
     </div>
 
+    <!-- Modal: Business Review / Inspection -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-5 rounded-lg max-w-md w-full relative shadow-lg max-h-[85vh] overflow-y-auto text-xs">
+            <button onclick="closeModal('reviewModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+            <h3 class="text-sm font-bold mb-2 text-blue-900"><i class="fa-solid fa-circle-info mr-1"></i>Business Review Details</h3>
+            <div id="reviewContent" class="space-y-2">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Cart & Checkout -->
     <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-lg max-w-md w-full relative shadow-lg">
-            <button onclick="closeModal('cartModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-cart-shopping mr-1"></i>Checkout & Payment</h3>
+        <div class="bg-white p-5 rounded-lg max-w-sm w-full relative shadow-lg text-xs">
+            <button onclick="closeModal('cartModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+            <h3 class="text-sm font-bold mb-2.5 text-blue-900"><i class="fa-solid fa-cart-shopping mr-1"></i>Checkout</h3>
             
-            <div id="cartItemsList" class="space-y-2 max-h-36 overflow-y-auto mb-3 border-b pb-3 text-xs">
+            <div id="cartItemsList" class="space-y-1.5 max-h-32 overflow-y-auto mb-2.5 border-b pb-2.5">
                 <!-- Cart items -->
             </div>
 
-            <form action="https://formspree.io/f/mwloenoo" method="POST" class="space-y-2.5 text-xs" onsubmit="handleCheckout(event)">
+            <form action="https://formspree.io/f/mwloenoo" method="POST" class="space-y-2" onsubmit="handleCheckout(event)">
                 <input type="hidden" name="order_details" id="formspreeOrderDetails">
                 <div>
                     <label class="block font-medium text-gray-700">Customer Name</label>
-                    <input type="text" name="customer_name" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                    <input type="text" name="customer_name" required class="w-full mt-0.5 px-2 py-1 border rounded">
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Phone Number</label>
-                    <input type="text" name="phone" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                    <input type="text" name="phone" required class="w-full mt-0.5 px-2 py-1 border rounded">
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Payment Gateway</label>
-                    <select name="payment_method" id="paymentMethod" onchange="updatePaymentInstructions()" class="w-full mt-0.5 px-2.5 py-1.5 border rounded bg-white">
+                    <select name="payment_method" id="paymentMethod" onchange="updatePaymentInstructions()" class="w-full mt-0.5 px-2 py-1 border rounded bg-white text-[11px]">
                         <option value="M-Pesa">M-Pesa (Vodacom)</option>
                         <option value="CRDB">CRDB Bank</option>
                     </select>
                 </div>
-                <div id="paymentInstructions" class="bg-blue-50 p-2 rounded text-[11px] text-blue-800">
+                <div id="paymentInstructions" class="bg-blue-50 p-2 rounded text-[10px] text-blue-800">
                     Send money via M-Pesa to Lipa namba <strong>5544332 - Songwe Online Shop</strong> and enter SMS code below.
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Transaction Reference Code</label>
-                    <input type="text" name="transaction_code" required placeholder="e.g., 8H73K29PL" class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                    <input type="text" name="transaction_code" required placeholder="e.g., 8H73K29PL" class="w-full mt-0.5 px-2 py-1 border rounded">
                 </div>
-                <div class="flex justify-between font-bold text-sm pt-2 border-t">
+                <div class="flex justify-between font-bold text-sm pt-1.5 border-t">
                     <span>Total:</span>
                     <span id="cartTotalPrice">TZS 0</span>
                 </div>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 rounded transition">Complete Order & Send</button>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 rounded transition">Complete Order</button>
             </form>
         </div>
     </div>
 
-    <!-- JavaScript Application Logic with Firestore Integration -->
+    <!-- JavaScript Application Logic -->
     <script>
         let categories = ['Hospitality & Lodging', 'Agriculture & Food', 'Retail & Electronics', 'Crafts & Services'];
         let marketplaceData = [];
         let cart = [];
         let currentFilter = 'All';
 
-        // Helper to convert uploaded local image file into base64 string for Firestore storage
         function convertFileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -314,6 +319,9 @@
                 renderCategories();
                 renderProducts();
                 renderHubBusinesses();
+                if(!document.getElementById('adminModal').classList.contains('hidden')) {
+                    renderAdminList();
+                }
             } catch (e) {
                 console.error("Error loading Firestore data: ", e);
             }
@@ -344,11 +352,11 @@
             const list = document.getElementById('categoryList');
             const select = document.getElementById('bizCategory');
             
-            list.innerHTML = `<button onclick="filterCategory('All')" class="category-btn text-left px-2.5 py-1.5 rounded ${currentFilter === 'All' ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">All Categories</button>`;
+            list.innerHTML = `<button onclick="filterCategory('All')" class="category-btn text-left px-2 py-1 rounded ${currentFilter === 'All' ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">All Categories</button>`;
             select.innerHTML = '';
 
             categories.forEach(cat => {
-                list.innerHTML += `<button onclick="filterCategory('${cat}')" class="category-btn text-left px-2.5 py-1.5 rounded ${currentFilter === cat ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">${cat}</button>`;
+                list.innerHTML += `<button onclick="filterCategory('${cat}')" class="category-btn text-left px-2 py-1 rounded ${currentFilter === cat ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">${cat}</button>`;
                 select.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
         }
@@ -369,7 +377,7 @@
             const bizName = document.getElementById('bizName').value;
             const bizDescription = document.getElementById('bizDescription').value;
             const category = document.getElementById('bizCategory').value;
-            const bizImageFile = document.getElementById('bizImageFile').files[0];
+            const bizImagesFiles = document.getElementById('bizImagesFile').files;
             const prodName = document.getElementById('prodName').value;
             const prodPrice = parseFloat(document.getElementById('prodPrice').value);
             const prodDescription = document.getElementById('prodDescription').value;
@@ -378,14 +386,23 @@
             const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
             const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
 
-            const bizImageUrl = bizImageFile ? await convertFileToBase64(bizImageFile) : "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
+            let bizImagesUrls = [];
+            if(bizImagesFiles.length > 0) {
+                for(let file of bizImagesFiles) {
+                    const b64 = await convertFileToBase64(file);
+                    bizImagesUrls.push(b64);
+                }
+            } else {
+                bizImagesUrls.push("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400");
+            }
+
             const prodImageUrl = prodImageFile ? await convertFileToBase64(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
 
             const newEntry = {
                 businessName: bizName,
                 businessDescription: bizDescription,
                 category: category,
-                bizImage: bizImageUrl,
+                bizImages: bizImagesUrls,
                 products: [
                     { id: Date.now(), productName: prodName, productDescription: prodDescription, price: prodPrice, prodImage: prodImageUrl }
                 ],
@@ -403,7 +420,7 @@
                 loadMarketplaceFromFirestore();
             } catch (e) {
                 console.error("Error adding business to Firestore: ", e);
-                alert("Error saving data. Please check your Firestore configuration.");
+                alert("Error saving data.");
             }
         }
 
@@ -457,8 +474,9 @@
             let displayItems = [];
             marketplaceData.filter(b => b.confirmed).forEach((biz) => {
                 if(currentFilter === 'All' || biz.category === currentFilter) {
+                    const primaryLogo = (biz.bizImages && biz.bizImages.length > 0) ? biz.bizImages[0] : "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
                     biz.products.forEach(prod => {
-                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizImage: biz.bizImage, category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, docId: biz.docId });
+                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizLogo: primaryLogo, category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, docId: biz.docId });
                     });
                 }
             });
@@ -472,27 +490,27 @@
                 grid.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-40 bg-gray-200">
+                            <div class="relative h-36 bg-gray-200">
                                 <img src="${item.prodImage}" class="w-full h-full object-cover">
-                                <span class="absolute top-2 left-2 bg-blue-900 text-white text-[10px] px-2 py-0.5 rounded-full">${item.category}</span>
+                                <span class="absolute top-1.5 left-1.5 bg-blue-900 text-white text-[9px] px-2 py-0.5 rounded-full">${item.category}</span>
                             </div>
-                            <div class="p-3">
+                            <div class="p-2.5">
                                 <div class="flex items-center space-x-1.5 mb-1">
-                                    <img src="${item.bizImage}" class="w-5 h-5 rounded-full object-cover border">
+                                    <img src="${item.bizLogo}" class="w-4.5 h-4.5 rounded-full object-cover border">
                                     <span class="text-[11px] text-gray-700 font-bold">${item.businessName}</span>
                                 </div>
-                                <p class="text-[10px] text-gray-500 mb-1">${item.businessDescription}</p>
-                                <h3 class="font-bold text-gray-900 text-sm mb-0.5">${item.productName}</h3>
-                                <p class="text-[11px] text-gray-600 mb-1">${item.productDescription || ''}</p>
-                                <p class="text-blue-900 font-bold text-xs mb-1.5">TZS ${item.price.toLocaleString()}</p>
+                                <p class="text-[10px] text-gray-500 mb-1">${item.businessDescription || ''}</p>
+                                <h3 class="font-bold text-gray-900 text-xs mb-0.5">${item.productName}</h3>
+                                <p class="text-[10px] text-gray-600 mb-1">${item.productDescription || ''}</p>
+                                <p class="text-blue-900 font-bold text-xs mb-1">TZS ${item.price.toLocaleString()}</p>
                                 ${item.deliveryAvailable ? `<p class="text-[10px] text-green-600 font-medium"><i class="fa-solid fa-truck-fast mr-1"></i>Delivery in ${item.deliveryLocation} (+TZS ${item.deliveryCost.toLocaleString()})</p>` : `<p class="text-[10px] text-gray-400">Pickup only</p>`}
                             </div>
                         </div>
-                        <div class="p-3 pt-0 flex gap-2">
-                            <button onclick="addToCart(${item.id})" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold py-1.5 rounded transition">
+                        <div class="p-2.5 pt-0 flex gap-1.5">
+                            <button onclick="addToCart(${item.id})" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-semibold py-1 rounded transition">
                                 <i class="fa-solid fa-cart-plus mr-1"></i> Add
                             </button>
-                            <button onclick="openAddProductModal('${item.docId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-2.5 py-1.5 rounded transition" title="Add another product to this business">
+                            <button onclick="openAddProductModal('${item.docId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-[11px] px-2 py-1 rounded transition" title="Add another product">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -521,9 +539,10 @@
             
             let results = [];
             marketplaceData.filter(b => b.confirmed).forEach(biz => {
+                const primaryLogo = (biz.bizImages && biz.bizImages.length > 0) ? biz.bizImages[0] : "";
                 biz.products.forEach(prod => {
                     if(prod.productName.toLowerCase().includes(query) || biz.businessName.toLowerCase().includes(query)) {
-                        results.push({ ...prod, businessName: biz.businessName, bizImage: biz.bizImage, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost });
+                        results.push({ ...prod, businessName: biz.businessName, bizLogo: primaryLogo, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost });
                     }
                 });
             });
@@ -537,15 +556,15 @@
                 grid.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-40 bg-gray-200"><img src="${item.prodImage}" class="w-full h-full object-cover"></div>
-                            <div class="p-3">
+                            <div class="relative h-36 bg-gray-200"><img src="${item.prodImage}" class="w-full h-full object-cover"></div>
+                            <div class="p-2.5">
                                 <p class="text-[10px] text-gray-500">${item.businessName}</p>
-                                <h3 class="font-bold text-gray-900 text-sm">${item.productName}</h3>
-                                <p class="text-[11px] text-gray-600">${item.productDescription || ''}</p>
+                                <h3 class="font-bold text-gray-900 text-xs">${item.productName}</h3>
+                                <p class="text-[10px] text-gray-600">${item.productDescription || ''}</p>
                                 <p class="text-blue-900 font-bold text-xs">TZS ${item.price.toLocaleString()}</p>
                             </div>
                         </div>
-                        <div class="p-3 pt-0"><button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-xs font-semibold py-1.5 rounded">Add to Selection</button></div>
+                        <div class="p-2.5 pt-0"><button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-[11px] font-semibold py-1 rounded">Add to Selection</button></div>
                     </div>
                 `;
             });
@@ -571,18 +590,50 @@
             }
             marketplaceData.forEach((item) => {
                 container.innerHTML += `
-                    <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded border text-xs">
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border text-xs">
                         <div>
-                            <p class="font-bold text-gray-900">${item.businessName} <span class="text-[10px] font-normal px-1.5 py-0.5 rounded ${item.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${item.confirmed ? 'Confirmed' : 'Pending Payment'}</span></p>
-                            <p class="text-gray-500 text-[11px]">${item.products.length} product(s) listed • Category: ${item.category}</p>
+                            <p class="font-bold text-gray-900">${item.businessName} <span class="text-[9px] font-normal px-1.5 py-0.5 rounded ${item.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${item.confirmed ? 'Confirmed' : 'Pending'}</span></p>
+                            <p class="text-gray-500 text-[10px]">${item.products.length} product(s) • ${item.category}</p>
                         </div>
-                        <div class="flex space-x-1.5">
-                            ${!item.confirmed ? `<button onclick="confirmBusinessPayment('${item.docId}')" class="bg-green-600 text-white px-2 py-1 rounded font-semibold"><i class="fa-solid fa-check mr-1"></i>Confirm</button>` : `<button onclick="toggleBusinessStatus('${item.docId}', ${item.confirmed})" class="bg-yellow-500 text-white px-2 py-1 rounded font-semibold">Pause</button>`}
-                            <button onclick="deleteBusiness('${item.docId}')" class="bg-red-100 text-red-800 px-2.5 py-1 rounded font-semibold"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex space-x-1">
+                            ${item.confirmed ? `<button onclick="openReviewModal('${item.docId}')" class="bg-blue-600 text-white px-2 py-0.5 rounded font-semibold text-[10px]" title="Review Business"><i class="fa-solid fa-eye mr-0.5"></i>Review</button>` : ''}
+                            ${!item.confirmed ? `<button onclick="confirmBusinessPayment('${item.docId}')" class="bg-green-600 text-white px-2 py-0.5 rounded font-semibold text-[10px]">Confirm</button>` : `<button onclick="toggleBusinessStatus('${item.docId}', ${item.confirmed})" class="bg-yellow-500 text-white px-2 py-0.5 rounded font-semibold text-[10px]">Pause</button>`}
+                            <button onclick="deleteBusiness('${item.docId}')" class="bg-red-100 text-red-800 px-2 py-0.5 rounded font-semibold text-[10px]"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             });
+        }
+
+        function openReviewModal(docId) {
+            const biz = marketplaceData.find(b => b.docId === docId);
+            if(!biz) return;
+            
+            let imagesHtml = '';
+            if(biz.bizImages && biz.bizImages.length > 0) {
+                biz.bizImages.forEach(img => {
+                    imagesHtml += `<img src="${img}" class="w-16 h-16 object-cover rounded border">`;
+                });
+            }
+
+            let productsHtml = '';
+            biz.products.forEach(p => {
+                productsHtml += `<div class="bg-gray-50 p-1.5 rounded mb-1 flex justify-between items-center"><span>${p.productName} (TZS ${p.price.toLocaleString()})</span></div>`;
+            });
+
+            document.getElementById('reviewContent').innerHTML = `
+                <div>
+                    <p class="font-bold text-gray-900 text-sm mb-1">${biz.businessName}</p>
+                    <p class="text-gray-600 mb-2">${biz.businessDescription || 'No description provided.'}</p>
+                    <p class="font-semibold text-gray-700 mb-1">Category: ${biz.category}</p>
+                    <p class="font-semibold text-gray-700 mb-1">Delivery: ${biz.deliveryAvailable ? 'Yes ('+biz.deliveryLocation+' - TZS '+biz.deliveryCost+')' : 'No'}</p>
+                    <p class="font-semibold text-gray-700 mb-1">Business Gallery Images:</p>
+                    <div class="flex gap-2 flex-wrap mb-2">${imagesHtml}</div>
+                    <p class="font-semibold text-gray-700 mb-1">Listed Products (${biz.products.length}):</p>
+                    <div class="max-h-28 overflow-y-auto">${productsHtml}</div>
+                </div>
+            `;
+            openModal('reviewModal');
         }
 
         async function confirmBusinessPayment(docId) {
@@ -644,12 +695,12 @@
             cart.forEach((item, index) => {
                 total += item.price;
                 container.innerHTML += `
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center text-xs">
                         <div>
                             <p class="font-semibold">${item.productName}</p>
-                            <p class="text-[10px] text-gray-500">${item.businessName}</p>
+                            <p class="text-[9px] text-gray-500">${item.businessName}</p>
                         </div>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-1.5">
                             <span>TZS ${item.price.toLocaleString()}</span>
                             <button onclick="removeFromCart(${index})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
                         </div>
