@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanzania Digital Market Hub</title>
+    <title>Songwe Online Shop</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,17 +12,20 @@
 
     <!-- Top Navigation Bar -->
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="container mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-store text-xl text-yellow-400"></i>
-                <span class="text-lg font-bold tracking-wide">Tanzania Market Hub</span>
+                <div>
+                    <span class="text-lg font-bold tracking-wide">Songwe Online Shop</span>
+                    <p class="text-[10px] text-yellow-300 font-medium">Servicing: Mlowo, Vwawa, Tunduma, Karasha, Mpemba, Mahenje, Ileje</p>
+                </div>
             </div>
             <div class="flex items-center space-x-2">
                 <button onclick="openModal('businessModal')" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-3 py-1.5 rounded text-xs shadow transition">
                     <i class="fa-solid fa-briefcase mr-1"></i>Register Business
                 </button>
                 <button onclick="openModal('adminModal')" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold px-3 py-1.5 rounded text-xs transition">
-                    <i class="fa-solid fa-lock mr-1"></i>Admin
+                    <i class="fa-solid fa-lock mr-1"></i>Admin Portal
                 </button>
                 <button onclick="openModal('cartModal')" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-xs relative transition">
                     <i class="fa-solid fa-cart-shopping"></i> 
@@ -41,20 +44,13 @@
                 <h3 class="font-bold text-gray-900 text-sm flex items-center">
                     <i class="fa-solid fa-filter text-blue-900 mr-2"></i> Categories
                 </h3>
-                <button onclick="openModal('categoryModal')" class="text-xs text-blue-600 hover:underline font-semibold">
-                    <i class="fa-solid fa-plus mr-1"></i>Add Category
-                </button>
             </div>
             <div id="categoryList" class="flex flex-col space-y-1 text-sm">
-                <button onclick="filterCategory('All')" class="category-btn text-left px-2.5 py-1.5 rounded bg-blue-50 text-blue-900 font-semibold transition">All Categories</button>
-                <button onclick="filterCategory('Hospitality & Lodging')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Hospitality & Lodging</button>
-                <button onclick="filterCategory('Agriculture & Food')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Agriculture & Food</button>
-                <button onclick="filterCategory('Retail & Electronics')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Retail & Electronics</button>
-                <button onclick="filterCategory('Crafts & Services')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Crafts & Services</button>
+                <!-- Dynamic Category Buttons -->
             </div>
 
             <div class="mt-6 border-t pt-3">
-                <h4 class="font-semibold text-xs text-gray-500 mb-2">Registered Hub Businesses</h4>
+                <h4 class="font-semibold text-xs text-gray-500 mb-2">Confirmed Hub Businesses</h4>
                 <div id="hubBusinessList" class="text-xs space-y-1 text-gray-600 max-h-40 overflow-y-auto">
                     <!-- Dynamic List of Active Businesses -->
                 </div>
@@ -75,11 +71,11 @@
     </div>
 
     <!-- Floating WhatsApp Contact Button -->
-    <a href="https://wa.me/255700000000?text=Hello,%20I%20am%20inquiring%20about%20the%20Tanzania%20Market%20Hub." target="_blank" class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white p-3.5 rounded-full shadow-lg z-40 flex items-center justify-center transition">
+    <a href="https://wa.me/255700000000?text=Hello,%20I%20am%20inquiring%20about%20Songwe%20Online%20Shop." target="_blank" class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white p-3.5 rounded-full shadow-lg z-40 flex items-center justify-center transition">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
     </a>
 
-    <!-- Modal: Register / Edit Business -->
+    <!-- Modal: Register / Edit Business & Products -->
     <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-6">
         <div class="bg-white p-6 rounded-lg max-w-md w-full relative shadow-lg">
             <button onclick="closeModal('businessModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -91,6 +87,10 @@
                     <label class="block text-xs font-medium text-gray-700">Business Name</label>
                     <input type="text" id="bizName" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500">
                 </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700">Business Description</label>
+                    <textarea id="bizDescription" rows="2" placeholder="Describe your services or offerings..." class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500"></textarea>
+                </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs font-medium text-gray-700">Category</label>
@@ -99,13 +99,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700">Logo URL</label>
-                        <input type="url" id="bizImage" placeholder="https://..." required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
+                        <label class="block text-xs font-medium text-gray-700">Upload Business Logo</label>
+                        <input type="file" id="bizImageFile" accept="image/*" class="w-full mt-0.5 text-[11px] border rounded file:mr-2 file:py-1 file:px-2 file:border-0 file:text-[10px] file:bg-blue-50 file:text-blue-700">
                     </div>
                 </div>
 
                 <hr class="my-1">
-                <h4 class="font-semibold text-xs text-gray-800">Product Details</h4>
+                <h4 class="font-semibold text-xs text-gray-800">Initial Product Details</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs font-medium text-gray-700">Product Name</label>
@@ -117,8 +117,8 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700">Product Image URL</label>
-                    <input type="url" id="prodImage" placeholder="https://..." required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
+                    <label class="block text-xs font-medium text-gray-700">Upload Product Image</label>
+                    <input type="file" id="prodImageFile" accept="image/*" required class="w-full mt-0.5 text-[11px] border rounded file:mr-2 file:py-1 file:px-2 file:border-0 file:text-[10px] file:bg-blue-50 file:text-blue-700">
                 </div>
 
                 <div class="bg-gray-50 p-2.5 rounded border">
@@ -127,63 +127,91 @@
                         <span class="font-medium text-xs text-gray-700">Enable Delivery Service</span>
                     </label>
                     <div id="deliveryConfig" class="hidden mt-2 space-y-1.5">
-                        <input type="text" id="deliveryLocation" placeholder="Location/Region" class="w-full text-xs px-2 py-1 border rounded">
+                        <input type="text" id="deliveryLocation" placeholder="Town/Region (e.g., Tunduma)" class="w-full text-xs px-2 py-1 border rounded">
                         <input type="number" id="deliveryCost" placeholder="Delivery Cost (TZS)" class="w-full text-xs px-2 py-1 border rounded">
                     </div>
                 </div>
 
                 <div class="bg-yellow-50 p-2.5 rounded border border-yellow-200 text-xs text-yellow-800">
                     <p class="font-semibold">Listing Fee: 5,000 TZS</p>
+                    <p class="text-[11px] mt-0.5">Pay via M-Pesa or CRDB. Listing will go live once verified by Admin.</p>
                     <select id="regPaymentMethod" class="w-full mt-1 text-[11px] px-2 py-1 border rounded bg-white">
                         <option value="M-Pesa">M-Pesa (Vodacom)</option>
                         <option value="CRDB">CRDB Bank</option>
                     </select>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition">Submit & Pay Hub Fee</button>
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition">Submit Business for Verification</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Add Category -->
-    <div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-5 rounded-lg max-w-xs w-full relative shadow-lg">
-            <button onclick="closeModal('categoryModal')" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
-            <h3 class="text-sm font-bold mb-2 text-blue-900">Add New Category</h3>
-            <input type="text" id="newCategoryName" placeholder="Category Name" class="w-full px-2.5 py-1.5 text-xs border rounded mb-3">
-            <button onclick="addNewCategory()" class="w-full bg-blue-900 text-white text-xs py-1.5 rounded font-semibold">Add Category</button>
+    <!-- Modal: Add Product to Existing Business -->
+    <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-lg max-w-sm w-full relative shadow-lg">
+            <button onclick="closeModal('addProductModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-plus-circle mr-1"></i>Add Product</h3>
+            <form id="addProductForm" onsubmit="handleAdditionalProduct(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="addProdBizIndex">
+                <div>
+                    <label class="block font-medium text-gray-700">Product Name</label>
+                    <input type="text" id="extraProdName" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Price (TZS)</label>
+                    <input type="number" id="extraProdPrice" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Upload Product Image</label>
+                    <input type="file" id="extraProdImageFile" accept="image/*" required class="w-full mt-0.5 text-[11px] border rounded file:mr-2 file:py-1 file:px-2 file:border-0 file:text-[10px] file:bg-blue-50 file:text-blue-700">
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold">Publish Product</button>
+            </form>
         </div>
     </div>
 
     <!-- Modal: Admin Portal -->
     <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-lg max-w-lg w-full relative shadow-lg max-h-[85vh] overflow-y-auto">
+        <div class="bg-white p-6 rounded-lg max-w-xl w-full relative shadow-lg max-h-[85vh] overflow-y-auto">
             <button onclick="closeModal('adminModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <h3 class="text-base font-bold mb-3 text-gray-900"><i class="fa-solid fa-lock mr-1 text-blue-900"></i>Hub Admin Portal</h3>
+            <h3 class="text-base font-bold mb-3 text-gray-900"><i class="fa-solid fa-lock mr-1 text-blue-900"></i>Admin Portal</h3>
             
             <div id="adminLoginBox" class="space-y-3">
-                <p class="text-xs text-gray-500">Enter admin password to manage registered listings (Default password: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
+                <p class="text-xs text-gray-500">Enter admin password (Default: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
                 <input type="password" id="adminPasswordInput" placeholder="Password" class="w-full px-3 py-1.5 text-xs border rounded">
                 <button onclick="verifyAdmin()" class="w-full bg-blue-900 text-white text-xs py-1.5 rounded font-semibold">Access Admin Panel</button>
             </div>
 
-            <div id="adminDashboard" class="hidden space-y-3">
-                <p class="text-xs font-semibold text-green-700">Authorized Admin Access Granted</p>
-                <div id="adminListContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1">
-                    <!-- Dynamic Admin Item Cards -->
+            <div id="adminDashboard" class="hidden space-y-4">
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded border">
+                    <div>
+                        <p class="text-xs font-bold text-gray-900">Category Management</p>
+                        <p class="text-[11px] text-gray-500">Add new sorting categories to the shop.</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="text" id="newCategoryName" placeholder="New Category" class="px-2 py-1 text-xs border rounded">
+                        <button onclick="addNewCategory()" class="bg-blue-900 text-white text-xs px-3 py-1 rounded font-semibold">Add</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-gray-700 mb-2">Manage & Confirm Businesses</h4>
+                    <div id="adminListContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        <!-- Dynamic Admin Listing Cards -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Cart & Checkout via Formspree -->
+    <!-- Modal: Cart & Checkout -->
     <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white p-6 rounded-lg max-w-md w-full relative shadow-lg">
             <button onclick="closeModal('cartModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             <h3 class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-cart-shopping mr-1"></i>Checkout & Payment</h3>
             
             <div id="cartItemsList" class="space-y-2 max-h-36 overflow-y-auto mb-3 border-b pb-3 text-xs">
-                <!-- Cart items go here -->
+                <!-- Cart items -->
             </div>
 
             <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST" class="space-y-2.5 text-xs" onsubmit="handleCheckout(event)">
@@ -204,7 +232,7 @@
                     </select>
                 </div>
                 <div id="paymentInstructions" class="bg-blue-50 p-2 rounded text-[11px] text-blue-800">
-                    Send money via M-Pesa to Lipa namba <strong>5544332 - Tanzania Market Hub</strong> and enter code below.
+                    Send money via M-Pesa to Lipa namba <strong>5544332 - Songwe Online Shop</strong> and enter SMS code below.
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Transaction Reference Code</label>
@@ -226,26 +254,16 @@
             {
                 id: 1,
                 businessName: "Majimoto Safari Lodge",
+                businessDescription: "Luxury camping and eco-tourism lodge in Songwe region.",
                 category: "Hospitality & Lodging",
                 bizImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400",
-                productName: "Luxury Safari Tent",
-                price: 150000,
-                prodImage: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=400",
+                products: [
+                    { id: 101, productName: "Luxury Safari Tent", price: 150000, prodImage: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=400" }
+                ],
                 deliveryAvailable: true,
                 deliveryLocation: "Songwe & Mbeya Region",
-                deliveryCost: 10000
-            },
-            {
-                id: 2,
-                businessName: "Enrich Agro Hub",
-                category: "Agriculture & Food",
-                bizImage: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400",
-                productName: "Organic Sunflower Oil (5L)",
-                price: 25000,
-                prodImage: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400",
-                deliveryAvailable: true,
-                deliveryLocation: "Dar es Salaam & Arusha",
-                deliveryCost: 5000
+                deliveryCost: 10000,
+                confirmed: true
             }
         ];
 
@@ -260,17 +278,15 @@
 
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
-            if(modalId === 'businessModal' && document.getElementById('editIndex').value === '-1') {
+            if(modalId === 'businessModal') {
                 document.getElementById('businessForm').reset();
+                document.getElementById('editIndex').value = '-1';
                 document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-store mr-1"></i>Register Business & Products`;
             }
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
-            if(modalId === 'businessModal') {
-                document.getElementById('editIndex').value = '-1';
-            }
         }
 
         function toggleDeliveryInputs() {
@@ -302,84 +318,76 @@
             if(val && !categories.includes(val)) {
                 categories.push(val);
                 input.value = '';
-                closeModal('categoryModal');
                 renderCategories();
+                alert('Category added successfully!');
             }
         }
 
         function handleBusinessRegistration(event) {
             event.preventDefault();
-            const editIdx = parseInt(document.getElementById('editIndex').value);
             const bizName = document.getElementById('bizName').value;
+            const bizDescription = document.getElementById('bizDescription').value;
             const category = document.getElementById('bizCategory').value;
-            const bizImage = document.getElementById('bizImage').value;
+            const bizImageFile = document.getElementById('bizImageFile').files[0];
             const prodName = document.getElementById('prodName').value;
             const prodPrice = parseFloat(document.getElementById('prodPrice').value);
-            const prodImage = document.getElementById('prodImage').value;
+            const prodImageFile = document.getElementById('prodImageFile').files[0];
             const deliveryAvailable = document.getElementById('deliveryToggle').checked;
             const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
             const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
 
-            const entry = {
-                id: editIdx > -1 ? marketplaceData[editIdx].id : Date.now(),
+            const bizImageUrl = bizImageFile ? URL.createObjectURL(bizImageFile) : "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
+            const prodImageUrl = prodImageFile ? URL.createObjectURL(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
+
+            const newEntry = {
+                id: Date.now(),
                 businessName: bizName,
+                businessDescription: bizDescription,
                 category: category,
-                bizImage: bizImage,
-                productName: prodName,
-                price: prodPrice,
-                prodImage: prodImage,
+                bizImage: bizImageUrl,
+                products: [
+                    { id: Date.now() + 1, productName: prodName, price: prodPrice, prodImage: prodImageUrl }
+                ],
                 deliveryAvailable: deliveryAvailable,
                 deliveryLocation: deliveryLocation,
-                deliveryCost: deliveryCost
+                deliveryCost: deliveryCost,
+                confirmed: false // Requires admin payment confirmation
             };
 
-            if(editIdx > -1) {
-                marketplaceData[editIdx] = entry;
-                alert('Business listing updated successfully!');
-            } else {
-                alert('Business registration fee verified! Successfully published to the hub.');
-                marketplaceData.push(entry);
-            }
-
+            marketplaceData.push(newEntry);
+            alert('Business registered successfully! Pending payment confirmation by admin.');
             document.getElementById('businessForm').reset();
-            document.getElementById('editIndex').value = '-1';
             closeModal('businessModal');
-            renderProducts();
             renderHubBusinesses();
             if(!document.getElementById('adminModal').classList.contains('hidden')) {
                 renderAdminList();
             }
         }
 
-        function editBusiness(index) {
-            const item = marketplaceData[index];
-            document.getElementById('editIndex').value = index;
-            document.getElementById('bizName').value = item.businessName;
-            document.getElementById('bizCategory').value = item.category;
-            document.getElementById('bizImage').value = item.bizImage;
-            document.getElementById('prodName').value = item.productName;
-            document.getElementById('prodPrice').value = item.price;
-            document.getElementById('prodImage').value = item.prodImage;
-            
-            document.getElementById('deliveryToggle').checked = item.deliveryAvailable;
-            toggleDeliveryInputs();
-            if(item.deliveryAvailable) {
-                document.getElementById('deliveryLocation').value = item.deliveryLocation;
-                document.getElementById('deliveryCost').value = item.deliveryCost;
-            }
-
-            document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-pen mr-1"></i>Edit Business & Product`;
-            closeModal('adminModal');
-            openModal('businessModal');
+        function openAddProductModal(bizIndex) {
+            document.getElementById('addProdBizIndex').value = bizIndex;
+            document.getElementById('addProductForm').reset();
+            openModal('addProductModal');
         }
 
-        function deleteBusiness(index) {
-            if(confirm('Are you sure you want to remove this business and product from the hub?')) {
-                marketplaceData.splice(index, 1);
-                renderProducts();
-                renderHubBusinesses();
-                renderAdminList();
-            }
+        function handleAdditionalProduct(event) {
+            event.preventDefault();
+            const bizIndex = parseInt(document.getElementById('addProdBizIndex').value);
+            const prodName = document.getElementById('extraProdName').value;
+            const prodPrice = parseFloat(document.getElementById('extraProdPrice').value);
+            const prodImageFile = document.getElementById('extraProdImageFile').files[0];
+            const prodImageUrl = prodImageFile ? URL.createObjectURL(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
+
+            marketplaceData[bizIndex].products.push({
+                id: Date.now(),
+                productName: prodName,
+                price: prodPrice,
+                prodImage: prodImageUrl
+            });
+
+            alert('New product added successfully!');
+            closeModal('addProductModal');
+            renderProducts();
         }
 
         function filterCategory(category) {
@@ -392,14 +400,23 @@
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            const filtered = currentFilter === 'All' ? marketplaceData : marketplaceData.filter(item => item.category === currentFilter);
+            
+            // Collect all products from confirmed businesses matching current category filter
+            let displayItems = [];
+            marketplaceData.filter(b => b.confirmed).forEach((biz, bizIdx) => {
+                if(currentFilter === 'All' || biz.category === currentFilter) {
+                    biz.products.forEach(prod => {
+                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizImage: biz.bizImage, category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, bizIndex: bizIdx });
+                    });
+                }
+            });
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No commodities found.</p>`;
+            if (displayItems.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No confirmed commodities found in this category.</p>`;
                 return;
             }
 
-            filtered.forEach(item => {
+            displayItems.forEach(item => {
                 grid.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
@@ -410,16 +427,20 @@
                             <div class="p-3">
                                 <div class="flex items-center space-x-1.5 mb-1">
                                     <img src="${item.bizImage}" class="w-5 h-5 rounded-full object-cover border">
-                                    <span class="text-[11px] text-gray-600 font-medium">${item.businessName}</span>
+                                    <span class="text-[11px] text-gray-700 font-bold">${item.businessName}</span>
                                 </div>
+                                <p class="text-[10px] text-gray-500 mb-1">${item.businessDescription}</p>
                                 <h3 class="font-bold text-gray-900 text-sm mb-0.5">${item.productName}</h3>
                                 <p class="text-blue-900 font-bold text-xs mb-1.5">TZS ${item.price.toLocaleString()}</p>
                                 ${item.deliveryAvailable ? `<p class="text-[10px] text-green-600 font-medium"><i class="fa-solid fa-truck-fast mr-1"></i>Delivery in ${item.deliveryLocation} (+TZS ${item.deliveryCost.toLocaleString()})</p>` : `<p class="text-[10px] text-gray-400">Pickup only</p>`}
                             </div>
                         </div>
-                        <div class="p-3 pt-0">
-                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold py-1.5 rounded transition">
-                                <i class="fa-solid fa-cart-plus mr-1"></i> Add to Selection
+                        <div class="p-3 pt-0 flex gap-2">
+                            <button onclick="addToCart(${item.id})" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold py-1.5 rounded transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Add
+                            </button>
+                            <button onclick="openAddProductModal(${item.bizIndex})" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-2.5 py-1.5 rounded transition" title="Add another product to this business">
+                                <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
                     </div>
@@ -430,9 +451,13 @@
         function renderHubBusinesses() {
             const listContainer = document.getElementById('hubBusinessList');
             listContainer.innerHTML = '';
-            const uniqueBusinesses = [...new Set(marketplaceData.map(item => item.businessName))];
-            uniqueBusinesses.forEach(biz => {
-                listContainer.innerHTML += `<div class="truncate">• ${biz}</div>`;
+            const confirmedBiz = marketplaceData.filter(b => b.confirmed);
+            if(confirmedBiz.length === 0) {
+                listContainer.innerHTML = `<span class="text-gray-400">No active businesses yet.</span>`;
+                return;
+            }
+            confirmedBiz.forEach(biz => {
+                listContainer.innerHTML += `<div class="truncate">• ${biz.businessName}</div>`;
             });
         }
 
@@ -440,7 +465,15 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            const results = marketplaceData.filter(item => item.productName.toLowerCase().includes(query) || item.businessName.toLowerCase().includes(query));
+            
+            let results = [];
+            marketplaceData.filter(b => b.confirmed).forEach(biz => {
+                biz.products.forEach(prod => {
+                    if(prod.productName.toLowerCase().includes(query) || biz.businessName.toLowerCase().includes(query)) {
+                        results.push({ ...prod, businessName: biz.businessName, bizImage: biz.bizImage, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost });
+                    }
+                });
+            });
 
             if (results.length === 0) {
                 grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No matching results.</p>`;
@@ -471,7 +504,7 @@
                 document.getElementById('adminDashboard').classList.remove('hidden');
                 renderAdminList();
             } else {
-                alert('Incorrect admin password. (Default is admin123)');
+                alert('Incorrect admin password.');
             }
         }
 
@@ -484,26 +517,59 @@
             }
             marketplaceData.forEach((item, index) => {
                 container.innerHTML += `
-                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border text-xs">
+                    <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded border text-xs">
                         <div>
-                            <p class="font-bold text-gray-900">${item.businessName}</p>
-                            <p class="text-gray-500 text-[11px]">${item.productName} — TZS ${item.price.toLocaleString()}</p>
+                            <p class="font-bold text-gray-900">${item.businessName} <span class="text-[10px] font-normal px-1.5 py-0.5 rounded ${item.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${item.confirmed ? 'Confirmed' : 'Pending Payment'}</span></p>
+                            <p class="text-gray-500 text-[11px]">${item.products.length} product(s) listed • Category: ${item.category}</p>
                         </div>
                         <div class="flex space-x-1.5">
-                            <button onclick="editBusiness(${index})" class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteBusiness(${index})" class="bg-red-100 text-red-800 px-2 py-1 rounded font-semibold"><i class="fa-solid fa-trash"></i></button>
+                            ${!item.confirmed ? `<button onclick="confirmBusinessPayment(${index})" class="bg-green-600 text-white px-2 py-1 rounded font-semibold" title="Confirm Payment & Publish"><i class="fa-solid fa-check mr-1"></i>Confirm Payment</button>` : `<button onclick="toggleBusinessStatus(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded font-semibold">Pause</button>`}
+                            <button onclick="deleteBusiness(${index})" class="bg-red-100 text-red-800 px-2.5 py-1 rounded font-semibold"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             });
         }
 
+        function confirmBusinessPayment(index) {
+            marketplaceData[index].confirmed = true;
+            alert(`Payment confirmed! Business "${marketplaceData[index].businessName}" is now live on Songwe Online Shop.`);
+            renderAdminList();
+            renderProducts();
+            renderHubBusinesses();
+        }
+
+        function toggleBusinessStatus(index) {
+            marketplaceData[index].confirmed = !marketplaceData[index].confirmed;
+            renderAdminList();
+            renderProducts();
+            renderHubBusinesses();
+        }
+
+        function deleteBusiness(index) {
+            if(confirm('Are you sure you want to remove this business?')) {
+                marketplaceData.splice(index, 1);
+                renderProducts();
+                renderHubBusinesses();
+                renderAdminList();
+            }
+        }
+
         function addToCart(id) {
-            const product = marketplaceData.find(i => i.id === id);
-            cart.push(product);
-            document.getElementById('cartCount').innerText = cart.length;
-            updateCartModal();
-            openModal('cartModal');
+            let foundProduct = null;
+            marketplaceData.forEach(biz => {
+                biz.products.forEach(prod => {
+                    if(prod.id === id) {
+                        foundProduct = { ...prod, businessName: biz.businessName };
+                    }
+                });
+            });
+            if(foundProduct) {
+                cart.push(foundProduct);
+                document.getElementById('cartCount').innerText = cart.length;
+                updateCartModal();
+                openModal('cartModal');
+            }
         }
 
         function updateCartModal() {
@@ -544,7 +610,7 @@
             const method = document.getElementById('paymentMethod').value;
             const infoBox = document.getElementById('paymentInstructions');
             if (method === 'M-Pesa') {
-                infoBox.innerHTML = `Send money via M-Pesa to Lipa namba <strong>5544332 - Tanzania Market Hub</strong> and enter SMS code below.`;
+                infoBox.innerHTML = `Send money via M-Pesa to Lipa namba <strong>5544332 - Songwe Online Shop</strong> and enter SMS code below.`;
             } else {
                 infoBox.innerHTML = `Transfer funds to <strong>CRDB Bank Account: 0150XXXXXXXXX00</strong> and enter bank receipt code below.`;
             }
