@@ -8,46 +8,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-gray-50 text-gray-800 font-sans pb-16">
 
     <!-- Top Navigation Bar -->
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-store text-2xl text-yellow-400"></i>
-                <span class="text-xl font-bold tracking-wide">Tanzania Market Hub</span>
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-store text-xl text-yellow-400"></i>
+                <span class="text-lg font-bold tracking-wide">Tanzania Market Hub</span>
             </div>
-            <div class="space-x-4">
-                <button onclick="openModal('businessModal')" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-4 py-2 rounded-lg shadow transition">
-                    <i class="fa-solid fa-briefcase mr-2"></i>Register Business
+            <div class="flex items-center space-x-2">
+                <button onclick="openModal('businessModal')" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-3 py-1.5 rounded text-xs shadow transition">
+                    <i class="fa-solid fa-briefcase mr-1"></i>Register Business
                 </button>
-                <button onclick="openModal('cartModal')" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-lg relative transition">
-                    <i class="fa-solid fa-cart-shopping"></i> Cart 
-                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                <button onclick="openModal('adminModal')" class="bg-gray-700 hover:bg-gray-800 text-white font-semibold px-3 py-1.5 rounded text-xs transition">
+                    <i class="fa-solid fa-lock mr-1"></i>Admin
+                </button>
+                <button onclick="openModal('cartModal')" class="bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded text-xs relative transition">
+                    <i class="fa-solid fa-cart-shopping"></i> 
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">0</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Main Content Layout -->
-    <div class="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+    <div class="container mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
         
-        <!-- 7. Side Sort / Category Filter Sidebar -->
-        <aside class="w-full md:w-1/4 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
-            <h3 class="text-lg font-bold mb-4 text-gray-900 border-b pb-2 flex items-center">
-                <i class="fa-solid fa-filter text-blue-900 mr-2"></i> Categories
-            </h3>
-            <div id="categoryList" class="flex flex-col space-y-2">
-                <button onclick="filterCategory('All')" class="category-btn text-left px-3 py-2 rounded-lg bg-blue-50 text-blue-900 font-semibold transition">All Categories</button>
-                <button onclick="filterCategory('Hospitality & Lodging')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Hospitality & Lodging</button>
-                <button onclick="filterCategory('Agriculture & Food')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Agriculture & Food</button>
-                <button onclick="filterCategory('Retail & Electronics')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Retail & Electronics</button>
-                <button onclick="filterCategory('Crafts & Services')" class="category-btn text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700 transition">Crafts & Services</button>
+        <!-- Side Sort / Category Filter Sidebar -->
+        <aside class="w-full md:w-1/4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 h-fit">
+            <div class="flex justify-between items-center mb-3 border-b pb-2">
+                <h3 class="font-bold text-gray-900 text-sm flex items-center">
+                    <i class="fa-solid fa-filter text-blue-900 mr-2"></i> Categories
+                </h3>
+                <button onclick="openModal('categoryModal')" class="text-xs text-blue-600 hover:underline font-semibold">
+                    <i class="fa-solid fa-plus mr-1"></i>Add Category
+                </button>
+            </div>
+            <div id="categoryList" class="flex flex-col space-y-1 text-sm">
+                <button onclick="filterCategory('All')" class="category-btn text-left px-2.5 py-1.5 rounded bg-blue-50 text-blue-900 font-semibold transition">All Categories</button>
+                <button onclick="filterCategory('Hospitality & Lodging')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Hospitality & Lodging</button>
+                <button onclick="filterCategory('Agriculture & Food')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Agriculture & Food</button>
+                <button onclick="filterCategory('Retail & Electronics')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Retail & Electronics</button>
+                <button onclick="filterCategory('Crafts & Services')" class="category-btn text-left px-2.5 py-1.5 rounded hover:bg-gray-100 text-gray-700 transition">Crafts & Services</button>
             </div>
 
-            <div class="mt-8 border-t pt-4">
-                <h4 class="font-semibold text-sm text-gray-500 mb-2">Registered Hub Businesses</h4>
-                <div id="hubBusinessList" class="text-sm space-y-1 text-gray-600 max-h-48 overflow-y-auto">
+            <div class="mt-6 border-t pt-3">
+                <h4 class="font-semibold text-xs text-gray-500 mb-2">Registered Hub Businesses</h4>
+                <div id="hubBusinessList" class="text-xs space-y-1 text-gray-600 max-h-40 overflow-y-auto">
                     <!-- Dynamic List of Active Businesses -->
                 </div>
             </div>
@@ -55,141 +63,165 @@
 
         <!-- Product & Marketplace Grid -->
         <main class="w-full md:w-3/4">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="currentCategoryTitle" class="text-2xl font-bold text-gray-900">Explore Marketplace</h2>
-                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search products or businesses..." class="px-4 py-2 border rounded-lg w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-5 gap-3">
+                <h2 id="currentCategoryTitle" class="text-xl font-bold text-gray-900">Explore Marketplace</h2>
+                <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search products or businesses..." class="px-3 py-1.5 text-sm border rounded-lg w-full sm:w-1/3 focus:outline-none focus:ring-1 focus:ring-blue-500">
             </div>
 
-            <!-- Product Cards Grid -->
-            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Dynamically Populated Products -->
             </div>
         </main>
     </div>
 
-    <!-- Modal 1: Register Business (Steps 1, 2, 4, 5) -->
-    <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-10">
-        <div class="bg-white p-8 rounded-xl max-w-lg w-full relative">
-            <button onclick="closeModal('businessModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-bold mb-4 text-blue-900"><i class="fa-solid fa-store mr-2"></i>Register Business & Products</h3>
+    <!-- Floating WhatsApp Contact Button -->
+    <a href="https://wa.me/255700000000?text=Hello,%20I%20am%20inquiring%20about%20the%20Tanzania%20Market%20Hub." target="_blank" class="fixed bottom-5 right-5 bg-green-500 hover:bg-green-600 text-white p-3.5 rounded-full shadow-lg z-40 flex items-center justify-center transition">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+    </a>
+
+    <!-- Modal: Register / Edit Business -->
+    <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-6">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full relative shadow-lg">
+            <button onclick="closeModal('businessModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 id="bizModalTitle" class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-store mr-1"></i>Register Business & Products</h3>
             
-            <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-4">
+            <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-3 text-sm">
+                <input type="hidden" id="editIndex" value="-1">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Business Name</label>
-                    <input type="text" id="bizName" required class="w-full mt-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-xs font-medium text-gray-700">Business Name</label>
+                    <input type="text" id="bizName" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Category</label>
-                    <select id="bizCategory" class="w-full mt-1 px-3 py-2 border rounded-lg">
-                        <option value="Hospitality & Lodging">Hospitality & Lodging</option>
-                        <option value="Agriculture & Food">Agriculture & Food</option>
-                        <option value="Retail & Electronics">Retail & Electronics</option>
-                        <option value="Crafts & Services">Crafts & Services</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Business Image URL (Logo / Photo)</label>
-                    <input type="url" id="bizImage" placeholder="https://example.com/image.jpg" required class="w-full mt-1 px-3 py-2 border rounded-lg">
-                </div>
-
-                <hr class="my-2">
-                <h4 class="font-semibold text-gray-800">First Product Details</h4>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Product Name</label>
-                        <input type="text" id="prodName" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                        <label class="block text-xs font-medium text-gray-700">Category</label>
+                        <select id="bizCategory" class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded bg-white">
+                            <!-- Dynamic Categories -->
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Price (TZS)</label>
-                        <input type="number" id="prodPrice" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                        <label class="block text-xs font-medium text-gray-700">Logo URL</label>
+                        <input type="url" id="bizImage" placeholder="https://..." required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
+                    </div>
+                </div>
+
+                <hr class="my-1">
+                <h4 class="font-semibold text-xs text-gray-800">Product Details</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700">Product Name</label>
+                        <input type="text" id="prodName" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700">Price (TZS)</label>
+                        <input type="number" id="prodPrice" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Product Image URL</label>
-                    <input type="url" id="prodImage" placeholder="https://example.com/product.jpg" required class="w-full mt-1 px-3 py-2 border rounded-lg">
+                    <label class="block text-xs font-medium text-gray-700">Product Image URL</label>
+                    <input type="url" id="prodImage" placeholder="https://..." required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded">
                 </div>
 
-                <!-- 5. Delivery Options Setup -->
-                <div class="bg-gray-50 p-3 rounded-lg border">
+                <div class="bg-gray-50 p-2.5 rounded border">
                     <label class="flex items-center space-x-2 cursor-pointer">
                         <input type="checkbox" id="deliveryToggle" onchange="toggleDeliveryInputs()" class="rounded text-blue-600">
-                        <span class="font-medium text-sm text-gray-700">Enable Delivery Service</span>
+                        <span class="font-medium text-xs text-gray-700">Enable Delivery Service</span>
                     </label>
-                    <div id="deliveryConfig" class="hidden mt-3 space-y-2">
-                        <input type="text" id="deliveryLocation" placeholder="Servicing Location / Region (e.g., Dar es Salaam)" class="w-full text-sm px-3 py-1 border rounded">
-                        <input type="number" id="deliveryCost" placeholder="Flat Delivery Cost (TZS)" class="w-full text-sm px-3 py-1 border rounded">
+                    <div id="deliveryConfig" class="hidden mt-2 space-y-1.5">
+                        <input type="text" id="deliveryLocation" placeholder="Location/Region" class="w-full text-xs px-2 py-1 border rounded">
+                        <input type="number" id="deliveryCost" placeholder="Delivery Cost (TZS)" class="w-full text-xs px-2 py-1 border rounded">
                     </div>
                 </div>
 
-                <!-- 2. Payment verification simulation for hub entry -->
-                <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 text-sm text-yellow-800">
-                    <p class="font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Hub Listing Fee Required</p>
-                    <p class="text-xs mt-1">A verification fee of 5,000 TZS must be paid via M-Pesa (Lipa namba) or CRDB before approval into the market hub.</p>
-                    <select id="regPaymentMethod" class="w-full mt-2 text-xs px-2 py-1 border rounded bg-white">
+                <div class="bg-yellow-50 p-2.5 rounded border border-yellow-200 text-xs text-yellow-800">
+                    <p class="font-semibold">Listing Fee: 5,000 TZS</p>
+                    <select id="regPaymentMethod" class="w-full mt-1 text-[11px] px-2 py-1 border rounded bg-white">
                         <option value="M-Pesa">M-Pesa (Vodacom)</option>
-                        <option value="CRDB">CRDB Bank (Account Transfer)</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2 rounded-lg transition">Submit & Pay Hub Fee</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal 2: Cart & Checkout via Formspree (Steps 3 & 6) -->
-    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-10">
-        <div class="bg-white p-8 rounded-xl max-w-lg w-full relative">
-            <button onclick="closeModal('cartModal')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <h3 class="text-xl font-bold mb-4 text-blue-900"><i class="fa-solid fa-cart-shopping mr-2"></i>Checkout & Payment</h3>
-            
-            <div id="cartItemsList" class="space-y-3 max-h-48 overflow-y-auto mb-4 border-b pb-4">
-                <!-- Cart products go here -->
-            </div>
-
-            <!-- 6. Formspree Form Submission -->
-            <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST" class="space-y-4" onsubmit="handleCheckout(event)">
-                <input type="hidden" name="order_details" id="formspreeOrderDetails">
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Customer Name</label>
-                    <input type="text" name="customer_name" required class="w-full mt-1 px-3 py-2 border rounded-lg">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Phone Number / Contact</label>
-                    <input type="text" name="phone" required class="w-full mt-1 px-3 py-2 border rounded-lg">
-                </div>
-                
-                <!-- 3. Payment Option Selection -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Select Payment Gateway</label>
-                    <select name="payment_method" id="paymentMethod" onchange="updatePaymentInstructions()" class="w-full mt-1 px-3 py-2 border rounded-lg">
-                        <option value="M-Pesa">M-Pesa (Vodacom / Mobile Money)</option>
                         <option value="CRDB">CRDB Bank</option>
                     </select>
                 </div>
 
-                <div id="paymentInstructions" class="bg-blue-50 p-3 rounded-lg text-xs text-blue-800">
-                    Send money via M-Pesa to <strong>+255 700 000 000</strong> and enter transaction code below.
-                </div>
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition">Submit & Pay Hub Fee</button>
+            </form>
+        </div>
+    </div>
 
+    <!-- Modal: Add Category -->
+    <div id="categoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-5 rounded-lg max-w-xs w-full relative shadow-lg">
+            <button onclick="closeModal('categoryModal')" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="text-sm font-bold mb-2 text-blue-900">Add New Category</h3>
+            <input type="text" id="newCategoryName" placeholder="Category Name" class="w-full px-2.5 py-1.5 text-xs border rounded mb-3">
+            <button onclick="addNewCategory()" class="w-full bg-blue-900 text-white text-xs py-1.5 rounded font-semibold">Add Category</button>
+        </div>
+    </div>
+
+    <!-- Modal: Admin Portal -->
+    <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-lg max-w-lg w-full relative shadow-lg max-h-[85vh] overflow-y-auto">
+            <button onclick="closeModal('adminModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold mb-3 text-gray-900"><i class="fa-solid fa-lock mr-1 text-blue-900"></i>Hub Admin Portal</h3>
+            
+            <div id="adminLoginBox" class="space-y-3">
+                <p class="text-xs text-gray-500">Enter admin password to manage registered listings (Default password: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
+                <input type="password" id="adminPasswordInput" placeholder="Password" class="w-full px-3 py-1.5 text-xs border rounded">
+                <button onclick="verifyAdmin()" class="w-full bg-blue-900 text-white text-xs py-1.5 rounded font-semibold">Access Admin Panel</button>
+            </div>
+
+            <div id="adminDashboard" class="hidden space-y-3">
+                <p class="text-xs font-semibold text-green-700">Authorized Admin Access Granted</p>
+                <div id="adminListContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <!-- Dynamic Admin Item Cards -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Cart & Checkout via Formspree -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full relative shadow-lg">
+            <button onclick="closeModal('cartModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <h3 class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-cart-shopping mr-1"></i>Checkout & Payment</h3>
+            
+            <div id="cartItemsList" class="space-y-2 max-h-36 overflow-y-auto mb-3 border-b pb-3 text-xs">
+                <!-- Cart items go here -->
+            </div>
+
+            <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST" class="space-y-2.5 text-xs" onsubmit="handleCheckout(event)">
+                <input type="hidden" name="order_details" id="formspreeOrderDetails">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Bank / Transaction Reference Code</label>
-                    <input type="text" name="transaction_code" required placeholder="e.g., 8H73K29PL" class="w-full mt-1 px-3 py-2 border rounded-lg">
+                    <label class="block font-medium text-gray-700">Customer Name</label>
+                    <input type="text" name="customer_name" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
                 </div>
-
-                <div class="flex justify-between font-bold text-lg pt-2 border-t">
+                <div>
+                    <label class="block font-medium text-gray-700">Phone Number</label>
+                    <input type="text" name="phone" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Payment Gateway</label>
+                    <select name="payment_method" id="paymentMethod" onchange="updatePaymentInstructions()" class="w-full mt-0.5 px-2.5 py-1.5 border rounded bg-white">
+                        <option value="M-Pesa">M-Pesa (Vodacom)</option>
+                        <option value="CRDB">CRDB Bank</option>
+                    </select>
+                </div>
+                <div id="paymentInstructions" class="bg-blue-50 p-2 rounded text-[11px] text-blue-800">
+                    Send money via M-Pesa to Lipa namba <strong>5544332 - Tanzania Market Hub</strong> and enter code below.
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Transaction Reference Code</label>
+                    <input type="text" name="transaction_code" required placeholder="e.g., 8H73K29PL" class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
+                </div>
+                <div class="flex justify-between font-bold text-sm pt-2 border-t">
                     <span>Total:</span>
                     <span id="cartTotalPrice">TZS 0</span>
                 </div>
-
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition">Complete Order & Send</button>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 rounded transition">Complete Order & Send</button>
             </form>
         </div>
     </div>
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Initial Database Mock Data (Demonstrating Market Hub sorting & listing)
+        let categories = ['Hospitality & Lodging', 'Agriculture & Food', 'Retail & Electronics', 'Crafts & Services'];
         let marketplaceData = [
             {
                 id: 1,
@@ -220,18 +252,25 @@
         let cart = [];
         let currentFilter = 'All';
 
-        // Initialize UI
         window.onload = function() {
+            renderCategories();
             renderProducts();
             renderHubBusinesses();
         };
 
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
+            if(modalId === 'businessModal' && document.getElementById('editIndex').value === '-1') {
+                document.getElementById('businessForm').reset();
+                document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-store mr-1"></i>Register Business & Products`;
+            }
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
+            if(modalId === 'businessModal') {
+                document.getElementById('editIndex').value = '-1';
+            }
         }
 
         function toggleDeliveryInputs() {
@@ -244,26 +283,45 @@
             }
         }
 
-        // 1 & 2 & 4 & 5. Handle Business and Product Registration with Payment Confirmation
+        function renderCategories() {
+            const list = document.getElementById('categoryList');
+            const select = document.getElementById('bizCategory');
+            
+            list.innerHTML = `<button onclick="filterCategory('All')" class="category-btn text-left px-2.5 py-1.5 rounded ${currentFilter === 'All' ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">All Categories</button>`;
+            select.innerHTML = '';
+
+            categories.forEach(cat => {
+                list.innerHTML += `<button onclick="filterCategory('${cat}')" class="category-btn text-left px-2.5 py-1.5 rounded ${currentFilter === cat ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">${cat}</button>`;
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        function addNewCategory() {
+            const input = document.getElementById('newCategoryName');
+            const val = input.value.trim();
+            if(val && !categories.includes(val)) {
+                categories.push(val);
+                input.value = '';
+                closeModal('categoryModal');
+                renderCategories();
+            }
+        }
+
         function handleBusinessRegistration(event) {
             event.preventDefault();
+            const editIdx = parseInt(document.getElementById('editIndex').value);
             const bizName = document.getElementById('bizName').value;
             const category = document.getElementById('bizCategory').value;
             const bizImage = document.getElementById('bizImage').value;
             const prodName = document.getElementById('prodName').value;
             const prodPrice = parseFloat(document.getElementById('prodPrice').value);
             const prodImage = document.getElementById('prodImage').value;
-            
             const deliveryAvailable = document.getElementById('deliveryToggle').checked;
             const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
             const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
-            const paymentMethod = document.getElementById('regPaymentMethod').value;
 
-            // Confirm payment validation simulation
-            alert(`Business listing registration fee verified successfully via ${paymentMethod}! Business "${bizName}" is now confirmed in the hub.`);
-
-            const newEntry = {
-                id: Date.now(),
+            const entry = {
+                id: editIdx > -1 ? marketplaceData[editIdx].id : Date.now(),
                 businessName: bizName,
                 category: category,
                 bizImage: bizImage,
@@ -275,63 +333,92 @@
                 deliveryCost: deliveryCost
             };
 
-            marketplaceData.push(newEntry);
+            if(editIdx > -1) {
+                marketplaceData[editIdx] = entry;
+                alert('Business listing updated successfully!');
+            } else {
+                alert('Business registration fee verified! Successfully published to the hub.');
+                marketplaceData.push(entry);
+            }
+
             document.getElementById('businessForm').reset();
+            document.getElementById('editIndex').value = '-1';
             closeModal('businessModal');
             renderProducts();
             renderHubBusinesses();
+            if(!document.getElementById('adminModal').classList.contains('hidden')) {
+                renderAdminList();
+            }
         }
 
-        // 7. Side Sort / Category Filter Logic
+        function editBusiness(index) {
+            const item = marketplaceData[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('bizName').value = item.businessName;
+            document.getElementById('bizCategory').value = item.category;
+            document.getElementById('bizImage').value = item.bizImage;
+            document.getElementById('prodName').value = item.productName;
+            document.getElementById('prodPrice').value = item.price;
+            document.getElementById('prodImage').value = item.prodImage;
+            
+            document.getElementById('deliveryToggle').checked = item.deliveryAvailable;
+            toggleDeliveryInputs();
+            if(item.deliveryAvailable) {
+                document.getElementById('deliveryLocation').value = item.deliveryLocation;
+                document.getElementById('deliveryCost').value = item.deliveryCost;
+            }
+
+            document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-pen mr-1"></i>Edit Business & Product`;
+            closeModal('adminModal');
+            openModal('businessModal');
+        }
+
+        function deleteBusiness(index) {
+            if(confirm('Are you sure you want to remove this business and product from the hub?')) {
+                marketplaceData.splice(index, 1);
+                renderProducts();
+                renderHubBusinesses();
+                renderAdminList();
+            }
+        }
+
         function filterCategory(category) {
             currentFilter = category;
             document.getElementById('currentCategoryTitle').innerText = category === 'All' ? 'Explore Marketplace' : category;
-            
-            // Highlight active button
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-50', 'text-blue-900', 'font-semibold');
-                btn.classList.add('hover:bg-gray-100', 'text-gray-700');
-                if (btn.innerText.includes(category)) {
-                    btn.classList.add('bg-blue-50', 'text-blue-900', 'font-semibold');
-                    btn.classList.remove('hover:bg-gray-100', 'text-gray-700');
-                }
-            });
+            renderCategories();
             renderProducts();
         }
 
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-
-            const filtered = currentFilter === 'All' 
-                ? marketplaceData 
-                : marketplaceData.filter(item => item.category === currentFilter);
+            const filtered = currentFilter === 'All' ? marketplaceData : marketplaceData.filter(item => item.category === currentFilter);
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-8">No commodities found in this category.</p>`;
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No commodities found.</p>`;
                 return;
             }
 
             filtered.forEach(item => {
                 grid.innerHTML += `
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-48 bg-gray-200">
-                                <img src="${item.prodImage}" alt="${item.productName}" class="w-full h-full object-cover">
-                                <span class="absolute top-2 left-2 bg-blue-900 text-white text-xs px-2.5 py-1 rounded-full">${item.category}</span>
+                            <div class="relative h-40 bg-gray-200">
+                                <img src="${item.prodImage}" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 bg-blue-900 text-white text-[10px] px-2 py-0.5 rounded-full">${item.category}</span>
                             </div>
-                            <div class="p-4">
-                                <div class="flex items-center space-x-2 mb-2">
-                                    <img src="${item.bizImage}" class="w-6 h-6 rounded-full object-cover border">
-                                    <span class="text-xs text-gray-600 font-medium">${item.businessName}</span>
+                            <div class="p-3">
+                                <div class="flex items-center space-x-1.5 mb-1">
+                                    <img src="${item.bizImage}" class="w-5 h-5 rounded-full object-cover border">
+                                    <span class="text-[11px] text-gray-600 font-medium">${item.businessName}</span>
                                 </div>
-                                <h3 class="font-bold text-gray-900 text-lg mb-1">${item.productName}</h3>
-                                <p class="text-blue-900 font-bold mb-2">TZS ${item.price.toLocaleString()}</p>
-                                ${item.deliveryAvailable ? `<p class="text-xs text-green-600 font-medium mb-3"><i class="fa-solid fa-truck-fast mr-1"></i> Delivery available in ${item.deliveryLocation} (+TZS ${item.deliveryCost.toLocaleString()})</p>` : `<p class="text-xs text-gray-400 mb-3">Pickup only</p>`}
+                                <h3 class="font-bold text-gray-900 text-sm mb-0.5">${item.productName}</h3>
+                                <p class="text-blue-900 font-bold text-xs mb-1.5">TZS ${item.price.toLocaleString()}</p>
+                                ${item.deliveryAvailable ? `<p class="text-[10px] text-green-600 font-medium"><i class="fa-solid fa-truck-fast mr-1"></i>Delivery in ${item.deliveryLocation} (+TZS ${item.deliveryCost.toLocaleString()})</p>` : `<p class="text-[10px] text-gray-400">Pickup only</p>`}
                             </div>
                         </div>
-                        <div class="p-4 pt-0">
-                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold py-2 rounded-lg transition">
+                        <div class="p-3 pt-0">
+                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold py-1.5 rounded transition">
                                 <i class="fa-solid fa-cart-plus mr-1"></i> Add to Selection
                             </button>
                         </div>
@@ -353,32 +440,58 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-
-            const results = marketplaceData.filter(item => 
-                item.productName.toLowerCase().includes(query) || 
-                item.businessName.toLowerCase().includes(query)
-            );
+            const results = marketplaceData.filter(item => item.productName.toLowerCase().includes(query) || item.businessName.toLowerCase().includes(query));
 
             if (results.length === 0) {
-                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-8">No results match your search.</p>`;
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No matching results.</p>`;
                 return;
             }
 
             results.forEach(item => {
                 grid.innerHTML += `
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-48 bg-gray-200">
-                                <img src="${item.prodImage}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="p-4">
-                                <p class="text-xs text-gray-500">${item.businessName}</p>
-                                <h3 class="font-bold text-gray-900 text-lg">${item.productName}</h3>
-                                <p class="text-blue-900 font-bold">TZS ${item.price.toLocaleString()}</p>
+                            <div class="relative h-40 bg-gray-200"><img src="${item.prodImage}" class="w-full h-full object-cover"></div>
+                            <div class="p-3">
+                                <p class="text-[10px] text-gray-500">${item.businessName}</p>
+                                <h3 class="font-bold text-gray-900 text-sm">${item.productName}</h3>
+                                <p class="text-blue-900 font-bold text-xs">TZS ${item.price.toLocaleString()}</p>
                             </div>
                         </div>
-                        <div class="p-4 pt-0">
-                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-sm font-semibold py-2 rounded-lg">Add to Selection</button>
+                        <div class="p-3 pt-0"><button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-xs font-semibold py-1.5 rounded">Add to Selection</button></div>
+                    </div>
+                `;
+            });
+        }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            if(pass === 'admin123') {
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                renderAdminList();
+            } else {
+                alert('Incorrect admin password. (Default is admin123)');
+            }
+        }
+
+        function renderAdminList() {
+            const container = document.getElementById('adminListContainer');
+            container.innerHTML = '';
+            if(marketplaceData.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500">No registered businesses found.</p>`;
+                return;
+            }
+            marketplaceData.forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border text-xs">
+                        <div>
+                            <p class="font-bold text-gray-900">${item.businessName}</p>
+                            <p class="text-gray-500 text-[11px]">${item.productName} — TZS ${item.price.toLocaleString()}</p>
+                        </div>
+                        <div class="flex space-x-1.5">
+                            <button onclick="editBusiness(${index})" class="bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteBusiness(${index})" class="bg-red-100 text-red-800 px-2 py-1 rounded font-semibold"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -397,24 +510,22 @@
             const container = document.getElementById('cartItemsList');
             container.innerHTML = '';
             let total = 0;
-
             if (cart.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center">Your selection is empty.</p>`;
+                container.innerHTML = `<p class="text-gray-500 text-center">Selection is empty.</p>`;
                 document.getElementById('cartTotalPrice').innerText = 'TZS 0';
                 return;
             }
-
             cart.forEach((item, index) => {
                 total += item.price;
                 container.innerHTML += `
-                    <div class="flex justify-between items-center text-sm">
+                    <div class="flex justify-between items-center">
                         <div>
                             <p class="font-semibold">${item.productName}</p>
-                            <p class="text-xs text-gray-500">${item.businessName}</p>
+                            <p class="text-[10px] text-gray-500">${item.businessName}</p>
                         </div>
-                        <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2">
                             <span>TZS ${item.price.toLocaleString()}</span>
-                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -429,21 +540,19 @@
             updateCartModal();
         }
 
-        // 3. Payment Instructions Switcher (M-Pesa vs CRDB)
         function updatePaymentInstructions() {
             const method = document.getElementById('paymentMethod').value;
             const infoBox = document.getElementById('paymentInstructions');
             if (method === 'M-Pesa') {
-                infoBox.innerHTML = `Send money via M-Pesa to Lipa namba <strong>5544332 - Tanzania Market Hub</strong> and enter your confirmation SMS code below.`;
+                infoBox.innerHTML = `Send money via M-Pesa to Lipa namba <strong>5544332 - Tanzania Market Hub</strong> and enter SMS code below.`;
             } else {
-                infoBox.innerHTML = `Transfer funds to <strong>CRDB Bank Account: 0150XXXXXXXXX00</strong> (Tanzania Market Hub) and enter your bank reference receipt code below.`;
+                infoBox.innerHTML = `Transfer funds to <strong>CRDB Bank Account: 0150XXXXXXXXX00</strong> and enter bank receipt code below.`;
             }
         }
 
         function handleCheckout(event) {
-            // Formspree handles the POST natively. This function clears the cart after submission.
             setTimeout(() => {
-                alert('Order successfully submitted to Formspree and sent to hub management!');
+                alert('Order successfully submitted to Formspree!');
                 cart = [];
                 document.getElementById('cartCount').innerText = 0;
                 closeModal('cartModal');
