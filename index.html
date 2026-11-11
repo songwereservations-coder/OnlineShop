@@ -121,11 +121,17 @@
                     <label class="block font-medium text-gray-700">Business Description</label>
                     <textarea id="bizDescription" rows="1.5" placeholder="Describe your services..." class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500"></textarea>
                 </div>
-                <div>
-                    <label class="block font-medium text-gray-700">Category</label>
-                    <select id="bizCategory" class="w-full mt-0.5 px-2 py-1 border rounded bg-white">
-                        <!-- Dynamic Categories -->
-                    </select>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-medium text-gray-700">Category</label>
+                        <select id="bizCategory" class="w-full mt-0.5 px-2 py-1 border rounded bg-white">
+                            <!-- Dynamic Categories -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700">Business Image / Logo</label>
+                        <input type="file" id="bizImageFile" accept="image/*" class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
+                    </div>
                 </div>
 
                 <div id="initialProductSection">
@@ -171,6 +177,34 @@
                 </div>
 
                 <button type="submit" id="bizSubmitBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition shadow">Submit Business for Verification</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add Product to Existing Business -->
+    <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-5 rounded-lg max-w-xs w-full relative shadow-lg">
+            <button onclick="closeModal('addProductModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+            <h3 class="text-sm font-bold mb-2.5 text-blue-900"><i class="fa-solid fa-plus-circle mr-1"></i>Add Product</h3>
+            <form id="addProductForm" onsubmit="handleAdditionalProduct(event)" class="space-y-2 text-xs">
+                <input type="hidden" id="addProdBizDocId">
+                <div>
+                    <label class="block font-medium text-gray-700">Product Name</label>
+                    <input type="text" id="extraProdName" required class="w-full mt-0.5 px-2 py-1 border rounded">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Price (TZS)</label>
+                    <input type="number" id="extraProdPrice" required class="w-full mt-0.5 px-2 py-1 border rounded">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Product Description</label>
+                    <textarea id="extraProdDescription" rows="1.5" placeholder="Details..." class="w-full mt-0.5 px-2 py-1 border rounded"></textarea>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Product Images (Multiple, Optional)</label>
+                    <input type="file" id="extraProdImagesFiles" accept="image/*" multiple class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold transition">Publish Product</button>
             </form>
         </div>
     </div>
@@ -264,4 +298,587 @@
                 </div>
                 <div class="flex justify-between font-bold text-sm pt-1.5 border-t">
                     <span>Total:</span>
-                    <span id="cartTotalPrice">
+                    <span id="cartTotalPrice">TZS 0</span>
+                </div>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 rounded transition">Purchase</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let categories = ['Hospitality & Lodging', 'Agriculture & Food', 'Retail & Electronics', 'Crafts & Services'];
+        let marketplaceData = [];
+        let cart = [];
+        let currentFilter = 'All';
+        let activeReviewDocId = null;
+
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function loadMarketplaceFromFirestore() {
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "marketplace_businesses"));
+                marketplaceData = [];
+                querySnapshot.forEach((document) => {
+                    marketplaceData.push({ docId: document.id, ...document.data() });
+                });
+
+                const catSnapshot = await window.getDocs(window.collection(window.db, "hub_metadata"));
+                catSnapshot.forEach((docSnap) => {
+                    if(docSnap.data().categories) {
+                        categories = docSnap.data().categories;
+                    }
+                });
+
+                renderCategories();
+                renderProducts();
+                renderHubBusinesses();
+                if(!document.getElementById('adminModal').classList.contains('hidden')) {
+                    renderAdminList();
+                }
+            } catch (e) {
+                console.error("Error loading Firestore data: ", e);
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            if(modalId === 'businessModal' && !document.getElementById('editDocId').value) {
+                document.getElementById('businessForm').reset();
+                document.getElementById('initialProductSection').style.display = 'block';
+                document.getElementById('paymentFeeBox').style.display = 'block';
+                document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-store mr-1"></i>Register Business`;
+                document.getElementById('bizSubmitBtn').innerText = "Submit Business for Verification";
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function toggleDeliveryInputs() {
+            const toggle = document.getElementById('deliveryToggle');
+            const config = document.getElementById('deliveryConfig');
+            if (toggle.checked) {
+                config.classList.remove('hidden');
+            } else {
+                config.classList.add('hidden');
+            }
+        }
+
+        function renderCategories() {
+            const list = document.getElementById('categoryList');
+            const select = document.getElementById('bizCategory');
+            
+            list.innerHTML = `<button onclick="filterCategory('All')" class="category-btn text-left px-2 py-1 rounded ${currentFilter === 'All' ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">All Categories</button>`;
+            select.innerHTML = '';
+
+            categories.forEach(cat => {
+                list.innerHTML += `<button onclick="filterCategory('${cat}')" class="category-btn text-left px-2 py-1 rounded ${currentFilter === cat ? 'bg-blue-50 text-blue-900 font-semibold' : 'hover:bg-gray-100 text-gray-700'} transition">${cat}</button>`;
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        async function addNewCategory() {
+            const input = document.getElementById('newCategoryName');
+            const val = input.value.trim();
+            if(val && !categories.includes(val)) {
+                categories.push(val);
+                input.value = '';
+                renderCategories();
+                
+                try {
+                    const metaSnap = await window.getDocs(window.collection(window.db, "hub_metadata"));
+                    if(!metaSnap.empty) {
+                        const metaId = metaSnap.docs[0].id;
+                        await window.updateDoc(window.doc(window.db, "hub_metadata", metaId), { categories: categories });
+                    } else {
+                        await window.addDoc(window.collection(window.db, "hub_metadata"), { categories: categories });
+                    }
+                } catch(e) {
+                    console.error("Error saving categories:", e);
+                }
+
+                alert('Category added successfully!');
+            }
+        }
+
+        async function handleBusinessRegistration(event) {
+            event.preventDefault();
+            const editDocId = document.getElementById('editDocId').value;
+            const bizName = document.getElementById('bizName').value;
+            const bizDescription = document.getElementById('bizDescription').value;
+            const category = document.getElementById('bizCategory').value;
+            const bizImageFile = document.getElementById('bizImageFile').files[0];
+            const deliveryAvailable = document.getElementById('deliveryToggle').checked;
+            const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
+            const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
+
+            let bizImageUrl = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
+            if(editDocId) {
+                const existingBiz = marketplaceData.find(b => b.docId === editDocId);
+                if(existingBiz) bizImageUrl = existingBiz.bizImage;
+            }
+            if(bizImageFile) {
+                bizImageUrl = await convertFileToBase64(bizImageFile);
+            }
+
+            if(editDocId) {
+                try {
+                    await window.updateDoc(window.doc(window.db, "marketplace_businesses", editDocId), {
+                        businessName: bizName,
+                        businessDescription: bizDescription,
+                        category: category,
+                        bizImage: bizImageUrl,
+                        deliveryAvailable: deliveryAvailable,
+                        deliveryLocation: deliveryLocation,
+                        deliveryCost: deliveryCost
+                    });
+                    alert('Business updated successfully!');
+                    document.getElementById('editDocId').value = '';
+                    closeModal('businessModal');
+                    loadMarketplaceFromFirestore();
+                } catch(e) {
+                    console.error("Error updating business:", e);
+                }
+            } else {
+                const prodName = document.getElementById('prodName').value;
+                const prodPrice = parseFloat(document.getElementById('prodPrice').value);
+                const prodDescription = document.getElementById('prodDescription').value;
+                const prodImagesFiles = document.getElementById('prodImagesFiles').files;
+
+                let prodImagesUrls = [];
+                if(prodImagesFiles.length > 0) {
+                    for(let file of prodImagesFiles) {
+                        const b64 = await convertFileToBase64(file);
+                        prodImagesUrls.push(b64);
+                    }
+                } else {
+                    prodImagesUrls.push("https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400");
+                }
+
+                const newEntry = {
+                    businessName: bizName,
+                    businessDescription: bizDescription,
+                    category: category,
+                    bizImage: bizImageUrl,
+                    products: [
+                        { id: Date.now(), productName: prodName, productDescription: prodDescription, price: prodPrice, prodImages: prodImagesUrls }
+                    ],
+                    deliveryAvailable: deliveryAvailable,
+                    deliveryLocation: deliveryLocation,
+                    deliveryCost: deliveryCost,
+                    confirmed: false
+                };
+
+                try {
+                    await window.addDoc(window.collection(window.db, "marketplace_businesses"), newEntry);
+                    alert('Business registered successfully! Pending payment confirmation by admin.');
+                    document.getElementById('businessForm').reset();
+                    closeModal('businessModal');
+                    loadMarketplaceFromFirestore();
+                } catch (e) {
+                    console.error("Error adding business to Firestore: ", e);
+                    alert("Error saving data.");
+                }
+            }
+        }
+
+        function openEditBusinessModal(docId) {
+            const biz = marketplaceData.find(b => b.docId === docId);
+            if(!biz) return;
+
+            document.getElementById('editDocId').value = docId;
+            document.getElementById('bizName').value = biz.businessName;
+            document.getElementById('bizDescription').value = biz.businessDescription || '';
+            document.getElementById('bizCategory').value = biz.category;
+            document.getElementById('deliveryToggle').checked = biz.deliveryAvailable;
+            toggleDeliveryInputs();
+            if(biz.deliveryAvailable) {
+                document.getElementById('deliveryLocation').value = biz.deliveryLocation || '';
+                document.getElementById('deliveryCost').value = biz.deliveryCost || 0;
+            }
+
+            document.getElementById('initialProductSection').style.display = 'none';
+            document.getElementById('paymentFeeBox').style.display = 'none';
+            document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-pen mr-1"></i>Edit Business Details`;
+            document.getElementById('bizSubmitBtn').innerText = "Save Changes";
+
+            closeModal('reviewModal');
+            openModal('businessModal');
+        }
+
+        function openAddProductModal(docId) {
+            document.getElementById('addProdBizDocId').value = docId;
+            document.getElementById('addProductForm').reset();
+            openModal('addProductModal');
+        }
+
+        async function handleAdditionalProduct(event) {
+            event.preventDefault();
+            const docId = document.getElementById('addProdBizDocId').value;
+            const prodName = document.getElementById('extraProdName').value;
+            const prodPrice = parseFloat(document.getElementById('extraProdPrice').value);
+            const prodDescription = document.getElementById('extraProdDescription').value;
+            const prodImagesFiles = document.getElementById('extraProdImagesFiles').files;
+
+            let prodImagesUrls = [];
+            if(prodImagesFiles.length > 0) {
+                for(let file of prodImagesFiles) {
+                    const b64 = await convertFileToBase64(file);
+                    prodImagesUrls.push(b64);
+                }
+            } else {
+                prodImagesUrls.push("https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400");
+            }
+
+            const biz = marketplaceData.find(b => b.docId === docId);
+            if(biz) {
+                biz.products.push({
+                    id: Date.now(),
+                    productName: prodName,
+                    productDescription: prodDescription,
+                    price: prodPrice,
+                    prodImages: prodImagesUrls
+                });
+
+                try {
+                    await window.updateDoc(window.doc(window.db, "marketplace_businesses", docId), { products: biz.products });
+                    alert('New product added successfully!');
+                    closeModal('addProductModal');
+                    loadMarketplaceFromFirestore();
+                } catch (e) {
+                    console.error("Error updating products: ", e);
+                }
+            }
+        }
+
+        function filterCategory(category) {
+            currentFilter = category;
+            document.getElementById('currentCategoryTitle').innerText = category === 'All' ? 'Explore Marketplace' : category;
+            renderCategories();
+            renderProducts();
+        }
+
+        window.slideImage = function(cardId, direction) {
+            const container = document.getElementById(`carousel-${cardId}`);
+            if(!container) return;
+            const totalImages = container.children.length;
+            let currentIndex = parseInt(container.getAttribute('data-index') || 0);
+            
+            currentIndex += direction;
+            if(currentIndex < 0) currentIndex = totalImages - 1;
+            if(currentIndex >= totalImages) currentIndex = 0;
+
+            container.setAttribute('data-index', currentIndex);
+            container.style.transform = `translateX(-${currentIndex * 100}%)`;
+        };
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            let displayItems = [];
+            marketplaceData.filter(b => b.confirmed).forEach((biz) => {
+                if(currentFilter === 'All' || biz.category === currentFilter) {
+                    biz.products.forEach(prod => {
+                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizImage: biz.bizImage || "", category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, docId: biz.docId, uniqueKey: `${biz.docId}-${prod.id}` });
+                    });
+                }
+            });
+
+            if (displayItems.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No confirmed commodities found in this category.</p>`;
+                return;
+            }
+
+            displayItems.forEach(item => {
+                let imagesHtml = '';
+                const pImages = item.prodImages && item.prodImages.length > 0 ? item.prodImages : ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400"];
+                pImages.forEach(img => {
+                    imagesHtml += `<img src="${img}" class="w-full h-full object-cover shrink-0">`;
+                });
+
+                grid.innerHTML += `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <!-- Product Image Carousel (Square Shape) -->
+                            <div class="relative aspect-square bg-gray-100 overflow-hidden rounded-t-lg">
+                                <div id="carousel-${item.uniqueKey}" data-index="0" class="flex transition-transform duration-300 w-full h-full">
+                                    ${imagesHtml}
+                                </div>
+                                ${pImages.length > 1 ? `
+                                    <button onclick="slideImage('${item.uniqueKey}', -1)" class="absolute left-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full text-[10px]"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button onclick="slideImage('${item.uniqueKey}', 1)" class="absolute right-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full text-[10px]"><i class="fa-solid fa-chevron-right"></i></button>
+                                ` : ''}
+                                <span class="absolute top-1.5 left-1.5 bg-blue-900 text-white text-[9px] px-2 py-0.5 rounded-full z-10">${item.category}</span>
+                            </div>
+                            <div class="p-2.5">
+                                <div class="flex items-center space-x-1.5 mb-1">
+                                    ${item.bizImage ? `<img src="${item.bizImage}" class="w-4.5 h-4.5 rounded-full object-cover border">` : ''}
+                                    <span class="text-[11px] text-gray-700 font-bold">${item.businessName}</span>
+                                </div>
+                                <p class="text-[10px] text-gray-500 mb-1">${item.businessDescription || ''}</p>
+                                <h3 class="font-bold text-gray-900 text-xs mb-0.5">${item.productName}</h3>
+                                <p class="text-[10px] text-gray-600 mb-1">${item.productDescription || ''}</p>
+                                <p class="text-blue-900 font-bold text-xs mb-1">TZS ${item.price.toLocaleString()}</p>
+                                ${item.deliveryAvailable ? `<p class="text-[10px] text-green-600 font-medium"><i class="fa-solid fa-truck-fast mr-1"></i>Delivery in ${item.deliveryLocation} (+TZS ${item.deliveryCost.toLocaleString()})</p>` : `<p class="text-[10px] text-gray-400">Pickup only</p>`}
+                            </div>
+                        </div>
+                        <div class="p-2.5 pt-0 flex gap-1.5">
+                            <button onclick="addToCart(${item.id})" class="w-full bg-blue-900 hover:bg-blue-800 text-white text-[11px] font-semibold py-1.5 rounded transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Add to Selection
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderHubBusinesses() {
+            const listContainer = document.getElementById('hubBusinessList');
+            listContainer.innerHTML = '';
+            const confirmedBiz = marketplaceData.filter(b => b.confirmed);
+            if(confirmedBiz.length === 0) {
+                listContainer.innerHTML = `<span class="text-gray-400">No active businesses yet.</span>`;
+                return;
+            }
+            confirmedBiz.forEach(biz => {
+                listContainer.innerHTML += `<div class="truncate">• ${biz.businessName}</div>`;
+            });
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            let results = [];
+            marketplaceData.filter(b => b.confirmed).forEach(biz => {
+                biz.products.forEach(prod => {
+                    if(prod.productName.toLowerCase().includes(query) || biz.businessName.toLowerCase().includes(query)) {
+                        results.push({ ...prod, businessName: biz.businessName, bizImage: biz.bizImage, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost });
+                    }
+                });
+            });
+
+            if (results.length === 0) {
+                grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-6 text-xs">No matching results.</p>`;
+                return;
+            }
+
+            results.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="relative aspect-square bg-gray-100"><img src="${item.prodImages[0]}" class="w-full h-full object-cover"></div>
+                            <div class="p-2.5">
+                                <p class="text-[10px] text-gray-500">${item.businessName}</p>
+                                <h3 class="font-bold text-gray-900 text-xs">${item.productName}</h3>
+                                <p class="text-[10px] text-gray-600">${item.productDescription || ''}</p>
+                                <p class="text-blue-900 font-bold text-xs">TZS ${item.price.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div class="p-2.5 pt-0"><button onclick="addToCart(${item.id})" class="w-full bg-blue-900 text-white text-[11px] font-semibold py-1.5 rounded">Add to Selection</button></div>
+                    </div>
+                `;
+            });
+        }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            if(pass === 'admin123') {
+                document.getElementById('adminLoginBox').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                renderAdminList();
+            } else {
+                alert('Incorrect admin password.');
+            }
+        }
+
+        function renderAdminList() {
+            const container = document.getElementById('adminListContainer');
+            container.innerHTML = '';
+            if(marketplaceData.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500">No registered businesses found.</p>`;
+                return;
+            }
+            marketplaceData.forEach((item) => {
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border text-xs">
+                        <div>
+                            <p class="font-bold text-gray-900">${item.businessName} <span class="text-[9px] font-normal px-1.5 py-0.5 rounded ${item.confirmed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${item.confirmed ? 'Confirmed' : 'Pending'}</span></p>
+                            <p class="text-gray-500 text-[10px]">${item.products.length} product(s) • ${item.category}</p>
+                        </div>
+                        <div class="flex space-x-1">
+                            ${item.confirmed ? `<button onclick="openReviewModal('${item.docId}')" class="bg-blue-600 text-white px-2 py-0.5 rounded font-semibold text-[10px]" title="Review Business"><i class="fa-solid fa-eye mr-0.5"></i>Review</button>` : ''}
+                            ${!item.confirmed ? `<button onclick="confirmBusinessPayment('${item.docId}')" class="bg-green-600 text-white px-2 py-0.5 rounded font-semibold text-[10px]">Confirm</button>` : `<button onclick="toggleBusinessStatus('${item.docId}', ${item.confirmed})" class="bg-yellow-500 text-white px-2 py-0.5 rounded font-semibold text-[10px]">Pause</button>`}
+                            <button onclick="deleteBusiness('${item.docId}')" class="bg-red-100 text-red-800 px-2 py-0.5 rounded font-semibold text-[10px]"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openReviewModal(docId) {
+            activeReviewDocId = docId;
+            const biz = marketplaceData.find(b => b.docId === docId);
+            if(!biz) return;
+            
+            let productsHtml = '';
+            biz.products.forEach(p => {
+                productsHtml += `<div class="bg-gray-50 p-1.5 rounded mb-1 flex justify-between items-center"><span>${p.productName} (TZS ${p.price.toLocaleString()})</span></div>`;
+            });
+
+            document.getElementById('reviewContent').innerHTML = `
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        ${biz.bizImage ? `<img src="${biz.bizImage}" class="w-12 h-12 rounded-full object-cover border">` : ''}
+                        <div>
+                            <p class="font-bold text-gray-900 text-sm">${biz.businessName}</p>
+                            <p class="text-gray-600 text-[11px]">${biz.businessDescription || 'No description provided.'}</p>
+                        </div>
+                    </div>
+                    <p class="font-semibold text-gray-700 mb-1">Category: ${biz.category}</p>
+                    <p class="font-semibold text-gray-700 mb-1">Delivery: ${biz.deliveryAvailable ? 'Yes ('+biz.deliveryLocation+' - TZS '+biz.deliveryCost+')' : 'No'}</p>
+                    <p class="font-semibold text-gray-700 mb-1">Listed Products (${biz.products.length}):</p>
+                    <div class="max-h-28 overflow-y-auto mb-3">${productsHtml}</div>
+                    <button onclick="openEditBusinessModal('${biz.docId}')" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold text-xs"><i class="fa-solid fa-pen mr-1"></i>Edit Business Information</button>
+                </div>
+            `;
+            openModal('reviewModal');
+        }
+
+        function openReviewInNewTab() {
+            const biz = marketplaceData.find(b => b.docId === activeReviewDocId);
+            if(!biz) return;
+
+            let newWindow = window.open('', '_blank');
+            let productsHtml = '';
+            biz.products.forEach(p => { productsHtml += `<li>${p.productName} — TZS ${p.price.toLocaleString()}</li>`; });
+
+            newWindow.document.write(`
+                <html>
+                <head><title>${biz.businessName} - Review</title></head>
+                <body style="font-family:sans-serif; padding:20px; color:#333;">
+                    ${biz.bizImage ? `<img src="${biz.bizImage}" style="width:80px; height:80px; border-radius:50%; object-fit:cover;">` : ''}
+                    <h1>${biz.businessName}</h1>
+                    <p><strong>Description:</strong> ${biz.businessDescription || 'N/A'}</p>
+                    <p><strong>Category:</strong> ${biz.category}</p>
+                    <p><strong>Delivery:</strong> ${biz.deliveryAvailable ? biz.deliveryLocation + ' (TZS ' + biz.deliveryCost + ')' : 'Not available'}</p>
+                    <h3>Products</h3>
+                    <ul>${productsHtml}</ul>
+                </body>
+                </html>
+            `);
+        }
+
+        async function confirmBusinessPayment(docId) {
+            try {
+                await window.updateDoc(window.doc(window.db, "marketplace_businesses", docId), { confirmed: true });
+                alert('Payment confirmed! Business is now live on Songwe Online Shop.');
+                loadMarketplaceFromFirestore();
+            } catch (e) {
+                console.error("Error confirming payment: ", e);
+            }
+        }
+
+        async function toggleBusinessStatus(docId, currentStatus) {
+            try {
+                await window.updateDoc(window.doc(window.db, "marketplace_businesses", docId), { confirmed: !currentStatus });
+                loadMarketplaceFromFirestore();
+            } catch (e) {
+                console.error("Error toggling status: ", e);
+            }
+        }
+
+        async function deleteBusiness(docId) {
+            if(confirm('Are you sure you want to remove this business?')) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "marketplace_businesses", docId));
+                    loadMarketplaceFromFirestore();
+                } catch (e) {
+                    console.error("Error deleting business: ", e);
+                }
+            }
+        }
+
+        function addToCart(id) {
+            let foundProduct = null;
+            marketplaceData.forEach(biz => {
+                biz.products.forEach(prod => {
+                    if(prod.id === id) {
+                        foundProduct = { ...prod, businessName: biz.businessName };
+                    }
+                });
+            });
+            if(foundProduct) {
+                cart.push(foundProduct);
+                document.getElementById('cartCount').innerText = cart.length;
+                updateCartModal();
+                openModal('cartModal');
+            }
+        }
+
+        function updateCartModal() {
+            const container = document.getElementById('cartItemsList');
+            container.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center">Selection is empty.</p>`;
+                document.getElementById('cartTotalPrice').innerText = 'TZS 0';
+                return;
+            }
+            cart.forEach((item, index) => {
+                total += item.price;
+                container.innerHTML += `
+                    <div class="flex justify-between items-center text-xs">
+                        <div>
+                            <p class="font-semibold">${item.productName}</p>
+                            <p class="text-[9px] text-gray-500">${item.businessName}</p>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            <span>TZS ${item.price.toLocaleString()}</span>
+                            <button onclick="removeFromCart(${index})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cartTotalPrice').innerText = `TZS ${total.toLocaleString()}`;
+            document.getElementById('formspreeOrderDetails').value = JSON.stringify(cart);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            document.getElementById('cartCount').innerText = cart.length;
+            updateCartModal();
+        }
+
+        function updatePaymentInstructions() {
+            const method = document.getElementById('paymentMethod').value;
+            const infoBox = document.getElementById('paymentInstructions');
+            if (method === 'M-Pesa') {
+                infoBox.innerHTML = `Send money via M-Pesa to Lipa namba <strong>5544332 - Songwe Online Shop</strong> and enter SMS code below.`;
+            } else {
+                infoBox.innerHTML = `Transfer funds to <strong>CRDB Bank Account: 0150XXXXXXXXX00</strong> and enter bank receipt code below.`;
+            }
+        }
+
+        function handleCheckout(event) {
+            setTimeout(() => {
+                alert('Order successfully submitted to Formspree!');
+                cart = [];
+                document.getElementById('cartCount').innerText = 0;
+                closeModal('cartModal');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
