@@ -7,6 +7,39 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs (v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // TODO: Replace with your actual Firebase project configuration keys
+        const firebaseConfig = {
+            apiKey: "AIzaSyDIzpHktpyEYZwxYFL6ekAcUIOSKdWEGbU",
+            authDomain: "songwe-online-shop.firebaseapp.com",
+            projectId: "songwe-online-shop",
+            storageBucket: "songwe-online-shop.firebasestorage.app",
+            messagingSenderId: "620488399977",
+            appId: "1:620488399977:web:652e3fd03607c1c1a756f8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Expose Firebase functions globally for the app script
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+
+        // Load data from Firestore on startup
+        window.onload = function() {
+            loadMarketplaceFromFirestore();
+        };
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans pb-16">
 
@@ -82,7 +115,6 @@
             <h3 id="bizModalTitle" class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-store mr-1"></i>Register Business & Products</h3>
             
             <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-3 text-sm">
-                <input type="hidden" id="editIndex" value="-1">
                 <div>
                     <label class="block text-xs font-medium text-gray-700">Business Name</label>
                     <input type="text" id="bizName" required class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500">
@@ -118,7 +150,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700">Product Description</label>
-                    <textarea id="prodDescription" rows="2" placeholder="Describe features, size, or quality of this product..." class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500"></textarea>
+                    <textarea id="prodDescription" rows="2" placeholder="Describe features or quality..." class="w-full mt-0.5 px-2.5 py-1.5 text-xs border rounded focus:ring-1 focus:ring-blue-500"></textarea>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700">Upload Product Image</label>
@@ -156,7 +188,7 @@
             <button onclick="closeModal('addProductModal')" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             <h3 class="text-base font-bold mb-3 text-blue-900"><i class="fa-solid fa-plus-circle mr-1"></i>Add Product</h3>
             <form id="addProductForm" onsubmit="handleAdditionalProduct(event)" class="space-y-3 text-xs">
-                <input type="hidden" id="addProdBizIndex">
+                <input type="hidden" id="addProdBizDocId">
                 <div>
                     <label class="block font-medium text-gray-700">Product Name</label>
                     <input type="text" id="extraProdName" required class="w-full mt-0.5 px-2.5 py-1.5 border rounded">
@@ -185,7 +217,7 @@
             <h3 class="text-base font-bold mb-3 text-gray-900"><i class="fa-solid fa-lock mr-1 text-blue-900"></i>Admin Portal</h3>
             
             <div id="adminLoginBox" class="space-y-3">
-                <p class="text-xs text-gray-500">Enter admin password: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
+                <p class="text-xs text-gray-500">Enter admin password (Default: <code class="bg-gray-100 p-0.5 rounded">admin123</code>)</p>
                 <input type="password" id="adminPasswordInput" placeholder="Password" class="w-full px-3 py-1.5 text-xs border rounded">
                 <button onclick="verifyAdmin()" class="w-full bg-blue-900 text-white text-xs py-1.5 rounded font-semibold">Access Admin Panel</button>
             </div>
@@ -222,7 +254,7 @@
                 <!-- Cart items -->
             </div>
 
-            <form action="https://formspree.io/f/mwloenoo" method="POST" class="space-y-2.5 text-xs" onsubmit="handleCheckout(event)">
+            <form action="https://formspree.io/f/YOUR_FORMSPREE_ENDPOINT" method="POST" class="space-y-2.5 text-xs" onsubmit="handleCheckout(event)">
                 <input type="hidden" name="order_details" id="formspreeOrderDetails">
                 <div>
                     <label class="block font-medium text-gray-700">Customer Name</label>
@@ -240,7 +272,7 @@
                     </select>
                 </div>
                 <div id="paymentInstructions" class="bg-blue-50 p-2 rounded text-[11px] text-blue-800">
-                    Send money via M-Pesa to <strong>0758 216 364 - Songwe Online Shop</strong> and enter SMS code below.
+                    Send money via M-Pesa to Lipa namba <strong>5544332 - Songwe Online Shop</strong> and enter SMS code below.
                 </div>
                 <div>
                     <label class="block font-medium text-gray-700">Transaction Reference Code</label>
@@ -255,41 +287,42 @@
         </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
+    <!-- JavaScript Application Logic with Firestore Integration -->
     <script>
         let categories = ['Hospitality & Lodging', 'Agriculture & Food', 'Retail & Electronics', 'Crafts & Services'];
-        let marketplaceData = [
-            {
-                id: 1,
-                businessName: "Majimoto Camping Lodge",
-                businessDescription: "Luxury camping and eco-tourism lodge in Songwe region.",
-                category: "Hospitality & Lodging",
-                bizImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400",
-                products: [
-                    { id: 101, productName: "Luxury Safari Tent", productDescription: "Spacious canvas tent with king bed and scenic wilderness views.", price: 150000, prodImage: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=400" }
-                ],
-                deliveryAvailable: true,
-                deliveryLocation: "Songwe & Mbeya Region",
-                deliveryCost: 10000,
-                confirmed: true
-            }
-        ];
-
+        let marketplaceData = [];
         let cart = [];
         let currentFilter = 'All';
 
-        window.onload = function() {
-            renderCategories();
-            renderProducts();
-            renderHubBusinesses();
-        };
+        // Helper to convert uploaded local image file into base64 string for Firestore storage
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function loadMarketplaceFromFirestore() {
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "marketplace_businesses"));
+                marketplaceData = [];
+                querySnapshot.forEach((document) => {
+                    marketplaceData.push({ docId: document.id, ...document.data() });
+                });
+                renderCategories();
+                renderProducts();
+                renderHubBusinesses();
+            } catch (e) {
+                console.error("Error loading Firestore data: ", e);
+            }
+        }
 
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
             if(modalId === 'businessModal') {
                 document.getElementById('businessForm').reset();
-                document.getElementById('editIndex').value = '-1';
-                document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-store mr-1"></i>Register Business & Products`;
             }
         }
 
@@ -331,7 +364,7 @@
             }
         }
 
-        function handleBusinessRegistration(event) {
+        async function handleBusinessRegistration(event) {
             event.preventDefault();
             const bizName = document.getElementById('bizName').value;
             const bizDescription = document.getElementById('bizDescription').value;
@@ -345,17 +378,16 @@
             const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
             const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
 
-            const bizImageUrl = bizImageFile ? URL.createObjectURL(bizImageFile) : "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
-            const prodImageUrl = prodImageFile ? URL.createObjectURL(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
+            const bizImageUrl = bizImageFile ? await convertFileToBase64(bizImageFile) : "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
+            const prodImageUrl = prodImageFile ? await convertFileToBase64(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
 
             const newEntry = {
-                id: Date.now(),
                 businessName: bizName,
                 businessDescription: bizDescription,
                 category: category,
                 bizImage: bizImageUrl,
                 products: [
-                    { id: Date.now() + 1, productName: prodName, productDescription: prodDescription, price: prodPrice, prodImage: prodImageUrl }
+                    { id: Date.now(), productName: prodName, productDescription: prodDescription, price: prodPrice, prodImage: prodImageUrl }
                 ],
                 deliveryAvailable: deliveryAvailable,
                 deliveryLocation: deliveryLocation,
@@ -363,42 +395,52 @@
                 confirmed: false
             };
 
-            marketplaceData.push(newEntry);
-            alert('Business registered successfully! Pending payment confirmation by admin.');
-            document.getElementById('businessForm').reset();
-            closeModal('businessModal');
-            renderHubBusinesses();
-            if(!document.getElementById('adminModal').classList.contains('hidden')) {
-                renderAdminList();
+            try {
+                await window.addDoc(window.collection(window.db, "marketplace_businesses"), newEntry);
+                alert('Business registered successfully! Pending payment confirmation by admin.');
+                document.getElementById('businessForm').reset();
+                closeModal('businessModal');
+                loadMarketplaceFromFirestore();
+            } catch (e) {
+                console.error("Error adding business to Firestore: ", e);
+                alert("Error saving data. Please check your Firestore configuration.");
             }
         }
 
-        function openAddProductModal(bizIndex) {
-            document.getElementById('addProdBizIndex').value = bizIndex;
+        function openAddProductModal(docId) {
+            document.getElementById('addProdBizDocId').value = docId;
             document.getElementById('addProductForm').reset();
             openModal('addProductModal');
         }
 
-        function handleAdditionalProduct(event) {
+        async function handleAdditionalProduct(event) {
             event.preventDefault();
-            const bizIndex = parseInt(document.getElementById('addProdBizIndex').value);
+            const docId = document.getElementById('addProdBizDocId').value;
             const prodName = document.getElementById('extraProdName').value;
             const prodPrice = parseFloat(document.getElementById('extraProdPrice').value);
             const prodDescription = document.getElementById('extraProdDescription').value;
             const prodImageFile = document.getElementById('extraProdImageFile').files[0];
-            const prodImageUrl = prodImageFile ? URL.createObjectURL(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
+            const prodImageUrl = prodImageFile ? await convertFileToBase64(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
 
-            marketplaceData[bizIndex].products.push({
-                id: Date.now(),
-                productName: prodName,
-                productDescription: prodDescription,
-                price: prodPrice,
-                prodImage: prodImageUrl
-            });
+            const biz = marketplaceData.find(b => b.docId === docId);
+            if(biz) {
+                biz.products.push({
+                    id: Date.now(),
+                    productName: prodName,
+                    productDescription: prodDescription,
+                    price: prodPrice,
+                    prodImage: prodImageUrl
+                });
 
-            alert('New product added successfully!');
-            closeModal('addProductModal');
-            renderProducts();
+                try {
+                    await window.updateDoc(window.doc(window.db, "marketplace_businesses", docId), { products: biz.products });
+                    alert('New product added successfully!');
+                    closeModal('addProductModal');
+                    loadMarketplaceFromFirestore();
+                } catch (e) {
+                    console.error("Error updating products: ", e);
+                }
+            }
         }
 
         function filterCategory(category) {
@@ -413,10 +455,10 @@
             grid.innerHTML = '';
             
             let displayItems = [];
-            marketplaceData.filter(b => b.confirmed).forEach((biz, bizIdx) => {
+            marketplaceData.filter(b => b.confirmed).forEach((biz) => {
                 if(currentFilter === 'All' || biz.category === currentFilter) {
                     biz.products.forEach(prod => {
-                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizImage: biz.bizImage, category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, bizIndex: bizIdx });
+                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizImage: biz.bizImage, category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, docId: biz.docId });
                     });
                 }
             });
@@ -450,7 +492,7 @@
                             <button onclick="addToCart(${item.id})" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold py-1.5 rounded transition">
                                 <i class="fa-solid fa-cart-plus mr-1"></i> Add
                             </button>
-                            <button onclick="openAddProductModal(${item.bizIndex})" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-2.5 py-1.5 rounded transition" title="Add another product to this business">
+                            <button onclick="openAddProductModal('${item.docId}')" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs px-2.5 py-1.5 rounded transition" title="Add another product to this business">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -527,7 +569,7 @@
                 container.innerHTML = `<p class="text-xs text-gray-500">No registered businesses found.</p>`;
                 return;
             }
-            marketplaceData.forEach((item, index) => {
+            marketplaceData.forEach((item) => {
                 container.innerHTML += `
                     <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded border text-xs">
                         <div>
@@ -535,35 +577,41 @@
                             <p class="text-gray-500 text-[11px]">${item.products.length} product(s) listed • Category: ${item.category}</p>
                         </div>
                         <div class="flex space-x-1.5">
-                            ${!item.confirmed ? `<button onclick="confirmBusinessPayment(${index})" class="bg-green-600 text-white px-2 py-1 rounded font-semibold" title="Confirm Payment & Publish"><i class="fa-solid fa-check mr-1"></i>Confirm Payment</button>` : `<button onclick="toggleBusinessStatus(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded font-semibold">Pause</button>`}
-                            <button onclick="deleteBusiness(${index})" class="bg-red-100 text-red-800 px-2.5 py-1 rounded font-semibold"><i class="fa-solid fa-trash"></i></button>
+                            ${!item.confirmed ? `<button onclick="confirmBusinessPayment('${item.docId}')" class="bg-green-600 text-white px-2 py-1 rounded font-semibold"><i class="fa-solid fa-check mr-1"></i>Confirm</button>` : `<button onclick="toggleBusinessStatus('${item.docId}', ${item.confirmed})" class="bg-yellow-500 text-white px-2 py-1 rounded font-semibold">Pause</button>`}
+                            <button onclick="deleteBusiness('${item.docId}')" class="bg-red-100 text-red-800 px-2.5 py-1 rounded font-semibold"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
             });
         }
 
-        function confirmBusinessPayment(index) {
-            marketplaceData[index].confirmed = true;
-            alert(`Payment confirmed! Business "${marketplaceData[index].businessName}" is now live on Songwe Online Shop.`);
-            renderAdminList();
-            renderProducts();
-            renderHubBusinesses();
+        async function confirmBusinessPayment(docId) {
+            try {
+                await window.updateDoc(window.doc(window.db, "marketplace_businesses", docId), { confirmed: true });
+                alert('Payment confirmed! Business is now live on Songwe Online Shop.');
+                loadMarketplaceFromFirestore();
+            } catch (e) {
+                console.error("Error confirming payment: ", e);
+            }
         }
 
-        function toggleBusinessStatus(index) {
-            marketplaceData[index].confirmed = !marketplaceData[index].confirmed;
-            renderAdminList();
-            renderProducts();
-            renderHubBusinesses();
+        async function toggleBusinessStatus(docId, currentStatus) {
+            try {
+                await window.updateDoc(window.doc(window.db, "marketplace_businesses", docId), { confirmed: !currentStatus });
+                loadMarketplaceFromFirestore();
+            } catch (e) {
+                console.error("Error toggling status: ", e);
+            }
         }
 
-        function deleteBusiness(index) {
+        async function deleteBusiness(docId) {
             if(confirm('Are you sure you want to remove this business?')) {
-                marketplaceData.splice(index, 1);
-                renderProducts();
-                renderHubBusinesses();
-                renderAdminList();
+                try {
+                    await window.deleteDoc(window.doc(window.db, "marketplace_businesses", docId));
+                    loadMarketplaceFromFirestore();
+                } catch (e) {
+                    console.error("Error deleting business: ", e);
+                }
             }
         }
 
