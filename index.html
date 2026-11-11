@@ -105,13 +105,14 @@
         <i class="fa-brands fa-whatsapp text-xl"></i>
     </a>
 
-    <!-- Modal: Register Business & Products -->
+    <!-- Modal: Register / Edit Business & Products -->
     <div id="businessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 overflow-y-auto py-5">
         <div class="bg-white p-5 rounded-lg max-w-sm w-full relative shadow-lg">
             <button onclick="closeModal('businessModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
-            <h3 class="text-sm font-bold mb-2.5 text-blue-900"><i class="fa-solid fa-store mr-1"></i>Register Business</h3>
+            <h3 id="bizModalTitle" class="text-sm font-bold mb-2.5 text-blue-900"><i class="fa-solid fa-store mr-1"></i>Register Business</h3>
             
             <form id="businessForm" onsubmit="handleBusinessRegistration(event)" class="space-y-2 text-xs">
+                <input type="hidden" id="editDocId" value="">
                 <div>
                     <label class="block font-medium text-gray-700">Business Name</label>
                     <input type="text" id="bizName" required class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500">
@@ -133,25 +134,27 @@
                     </div>
                 </div>
 
-                <hr class="my-1">
-                <h4 class="font-semibold text-gray-800">Initial Product Details</h4>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-medium text-gray-700">Product Name</label>
-                        <input type="text" id="prodName" required class="w-full mt-0.5 px-2 py-1 border rounded">
+                <div id="initialProductSection">
+                    <hr class="my-1">
+                    <h4 class="font-semibold text-gray-800">Initial Product Details</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-medium text-gray-700">Product Name</label>
+                            <input type="text" id="prodName" class="w-full mt-0.5 px-2 py-1 border rounded">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-gray-700">Price (TZS)</label>
+                            <input type="number" id="prodPrice" class="w-full mt-0.5 px-2 py-1 border rounded">
+                        </div>
                     </div>
                     <div>
-                        <label class="block font-medium text-gray-700">Price (TZS)</label>
-                        <input type="number" id="prodPrice" required class="w-full mt-0.5 px-2 py-1 border rounded">
+                        <label class="block font-medium text-gray-700">Product Description</label>
+                        <textarea id="prodDescription" rows="1.5" placeholder="Product details..." class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500"></textarea>
                     </div>
-                </div>
-                <div>
-                    <label class="block font-medium text-gray-700">Product Description</label>
-                    <textarea id="prodDescription" rows="1.5" placeholder="Product details..." class="w-full mt-0.5 px-2 py-1 border rounded focus:ring-1 focus:ring-blue-500"></textarea>
-                </div>
-                <div>
-                    <label class="block font-medium text-gray-700">Upload Product Image</label>
-                    <input type="file" id="prodImageFile" accept="image/*" required class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
+                    <div>
+                        <label class="block font-medium text-gray-700">Upload Product Image</label>
+                        <input type="file" id="prodImageFile" accept="image/*" class="w-full mt-0.5 text-[10px] border rounded file:mr-1 file:py-0.5 file:px-1.5 file:border-0 file:bg-blue-50 file:text-blue-700">
+                    </div>
                 </div>
 
                 <div class="bg-gray-50 p-2 rounded border">
@@ -165,7 +168,7 @@
                     </div>
                 </div>
 
-                <div class="bg-yellow-50 p-2 rounded border border-yellow-200 text-yellow-800">
+                <div id="paymentFeeBox" class="bg-yellow-50 p-2 rounded border border-yellow-200 text-yellow-800">
                     <p class="font-semibold">Listing Fee: 5,000 TZS</p>
                     <select id="regPaymentMethod" class="w-full mt-1 px-1.5 py-0.5 border rounded bg-white text-[11px]">
                         <option value="M-Pesa">M-Pesa (Vodacom)</option>
@@ -173,7 +176,7 @@
                     </select>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition shadow">Submit Business for Verification</button>
+                <button type="submit" id="bizSubmitBtn" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-1.5 rounded text-xs transition shadow">Submit Business for Verification</button>
             </form>
         </div>
     </div>
@@ -241,9 +244,14 @@
 
     <!-- Modal: Business Review / Inspection -->
     <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-5 rounded-lg max-w-md w-full relative shadow-lg max-h-[85vh] overflow-y-auto text-xs">
-            <button onclick="closeModal('reviewModal')" class="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
-            <h3 class="text-sm font-bold mb-2 text-blue-900"><i class="fa-solid fa-circle-info mr-1"></i>Business Review Details</h3>
+        <div class="bg-white p-5 rounded-lg max-w-lg w-full relative shadow-lg max-h-[85vh] overflow-y-auto text-xs">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-sm font-bold text-blue-900"><i class="fa-solid fa-circle-info mr-1"></i>Business Review Details</h3>
+                <div class="space-x-2">
+                    <button onclick="openReviewInNewTab()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded text-[11px] font-semibold"><i class="fa-solid fa-external-link-alt mr-1"></i>Open in New Tab</button>
+                    <button onclick="closeModal('reviewModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-base"></i></button>
+                </div>
+            </div>
             <div id="reviewContent" class="space-y-2">
                 <!-- Populated dynamically -->
             </div>
@@ -284,6 +292,10 @@
                     <label class="block font-medium text-gray-700">Transaction Reference Code</label>
                     <input type="text" name="transaction_code" required placeholder="e.g., 8H73K29PL" class="w-full mt-0.5 px-2 py-1 border rounded">
                 </div>
+                <div>
+                    <label class="block font-medium text-gray-700">Customer Description / Order Notes</label>
+                    <textarea name="customer_notes" rows="1.5" placeholder="Specify delivery instructions or order notes..." class="w-full mt-0.5 px-2 py-1 border rounded"></textarea>
+                </div>
                 <div class="flex justify-between font-bold text-sm pt-1.5 border-t">
                     <span>Total:</span>
                     <span id="cartTotalPrice">TZS 0</span>
@@ -299,6 +311,7 @@
         let marketplaceData = [];
         let cart = [];
         let currentFilter = 'All';
+        let activeReviewDocId = null;
 
         function convertFileToBase64(file) {
             return new Promise((resolve, reject) => {
@@ -316,6 +329,15 @@
                 querySnapshot.forEach((document) => {
                     marketplaceData.push({ docId: document.id, ...document.data() });
                 });
+
+                // Load custom categories if stored in Firestore metadata
+                const catSnapshot = await window.getDocs(window.collection(window.db, "hub_metadata"));
+                catSnapshot.forEach((docSnap) => {
+                    if(docSnap.data().categories) {
+                        categories = docSnap.data().categories;
+                    }
+                });
+
                 renderCategories();
                 renderProducts();
                 renderHubBusinesses();
@@ -329,8 +351,12 @@
 
         function openModal(modalId) {
             document.getElementById(modalId).classList.remove('hidden');
-            if(modalId === 'businessModal') {
+            if(modalId === 'businessModal' && !document.getElementById('editDocId').value) {
                 document.getElementById('businessForm').reset();
+                document.getElementById('initialProductSection').style.display = 'block';
+                document.getElementById('paymentFeeBox').style.display = 'block';
+                document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-store mr-1"></i>Register Business`;
+                document.getElementById('bizSubmitBtn').innerText = "Submit Business for Verification";
             }
         }
 
@@ -361,67 +387,134 @@
             });
         }
 
-        function addNewCategory() {
+        async function addNewCategory() {
             const input = document.getElementById('newCategoryName');
             const val = input.value.trim();
             if(val && !categories.includes(val)) {
                 categories.push(val);
                 input.value = '';
                 renderCategories();
+                
+                // Save categories permanently to Firestore metadata
+                try {
+                    const metaSnap = await window.getDocs(window.collection(window.db, "hub_metadata"));
+                    if(!metaSnap.empty) {
+                        const metaId = metaSnap.docs[0].id;
+                        await window.updateDoc(window.doc(window.db, "hub_metadata", metaId), { categories: categories });
+                    } else {
+                        await window.addDoc(window.collection(window.db, "hub_metadata"), { categories: categories });
+                    }
+                } catch(e) {
+                    console.error("Error saving categories:", e);
+                }
+
                 alert('Category added successfully!');
             }
         }
 
         async function handleBusinessRegistration(event) {
             event.preventDefault();
+            const editDocId = document.getElementById('editDocId').value;
             const bizName = document.getElementById('bizName').value;
             const bizDescription = document.getElementById('bizDescription').value;
             const category = document.getElementById('bizCategory').value;
             const bizImagesFiles = document.getElementById('bizImagesFile').files;
-            const prodName = document.getElementById('prodName').value;
-            const prodPrice = parseFloat(document.getElementById('prodPrice').value);
-            const prodDescription = document.getElementById('prodDescription').value;
-            const prodImageFile = document.getElementById('prodImageFile').files[0];
             const deliveryAvailable = document.getElementById('deliveryToggle').checked;
             const deliveryLocation = deliveryAvailable ? document.getElementById('deliveryLocation').value : '';
             const deliveryCost = deliveryAvailable ? parseFloat(document.getElementById('deliveryCost').value) || 0 : 0;
 
             let bizImagesUrls = [];
+            if(editDocId) {
+                const existingBiz = marketplaceData.find(b => b.docId === editDocId);
+                bizImagesUrls = existingBiz ? existingBiz.bizImages : [];
+            }
+
             if(bizImagesFiles.length > 0) {
                 for(let file of bizImagesFiles) {
                     const b64 = await convertFileToBase64(file);
                     bizImagesUrls.push(b64);
                 }
-            } else {
+            } else if(bizImagesUrls.length === 0) {
                 bizImagesUrls.push("https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400");
             }
 
-            const prodImageUrl = prodImageFile ? await convertFileToBase64(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
+            if(editDocId) {
+                // Update existing business
+                try {
+                    await window.updateDoc(window.doc(window.db, "marketplace_businesses", editDocId), {
+                        businessName: bizName,
+                        businessDescription: bizDescription,
+                        category: category,
+                        bizImages: bizImagesUrls,
+                        deliveryAvailable: deliveryAvailable,
+                        deliveryLocation: deliveryLocation,
+                        deliveryCost: deliveryCost
+                    });
+                    alert('Business updated successfully!');
+                    document.getElementById('editDocId').value = '';
+                    closeModal('businessModal');
+                    loadMarketplaceFromFirestore();
+                } catch(e) {
+                    console.error("Error updating business:", e);
+                }
+            } else {
+                // New registration
+                const prodName = document.getElementById('prodName').value;
+                const prodPrice = parseFloat(document.getElementById('prodPrice').value);
+                const prodDescription = document.getElementById('prodDescription').value;
+                const prodImageFile = document.getElementById('prodImageFile').files[0];
+                const prodImageUrl = prodImageFile ? await convertFileToBase64(prodImageFile) : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
 
-            const newEntry = {
-                businessName: bizName,
-                businessDescription: bizDescription,
-                category: category,
-                bizImages: bizImagesUrls,
-                products: [
-                    { id: Date.now(), productName: prodName, productDescription: prodDescription, price: prodPrice, prodImage: prodImageUrl }
-                ],
-                deliveryAvailable: deliveryAvailable,
-                deliveryLocation: deliveryLocation,
-                deliveryCost: deliveryCost,
-                confirmed: false
-            };
+                const newEntry = {
+                    businessName: bizName,
+                    businessDescription: bizDescription,
+                    category: category,
+                    bizImages: bizImagesUrls,
+                    products: [
+                        { id: Date.now(), productName: prodName, productDescription: prodDescription, price: prodPrice, prodImage: prodImageUrl }
+                    ],
+                    deliveryAvailable: deliveryAvailable,
+                    deliveryLocation: deliveryLocation,
+                    deliveryCost: deliveryCost,
+                    confirmed: false
+                };
 
-            try {
-                await window.addDoc(window.collection(window.db, "marketplace_businesses"), newEntry);
-                alert('Business registered successfully! Pending payment confirmation by admin.');
-                document.getElementById('businessForm').reset();
-                closeModal('businessModal');
-                loadMarketplaceFromFirestore();
-            } catch (e) {
-                console.error("Error adding business to Firestore: ", e);
-                alert("Error saving data.");
+                try {
+                    await window.addDoc(window.collection(window.db, "marketplace_businesses"), newEntry);
+                    alert('Business registered successfully! Pending payment confirmation by admin.');
+                    document.getElementById('businessForm').reset();
+                    closeModal('businessModal');
+                    loadMarketplaceFromFirestore();
+                } catch (e) {
+                    console.error("Error adding business to Firestore: ", e);
+                    alert("Error saving data.");
+                }
             }
+        }
+
+        function openEditBusinessModal(docId) {
+            const biz = marketplaceData.find(b => b.docId === docId);
+            if(!biz) return;
+
+            document.getElementById('editDocId').value = docId;
+            document.getElementById('bizName').value = biz.businessName;
+            document.getElementById('bizDescription').value = biz.businessDescription || '';
+            document.getElementById('bizCategory').value = biz.category;
+            document.getElementById('deliveryToggle').checked = biz.deliveryAvailable;
+            toggleDeliveryInputs();
+            if(biz.deliveryAvailable) {
+                document.getElementById('deliveryLocation').value = biz.deliveryLocation || '';
+                document.getElementById('deliveryCost').value = biz.deliveryCost || 0;
+            }
+
+            // Hide initial product & payment box during editing
+            document.getElementById('initialProductSection').style.display = 'none';
+            document.getElementById('paymentFeeBox').style.display = 'none';
+            document.getElementById('bizModalTitle').innerHTML = `<i class="fa-solid fa-pen mr-1"></i>Edit Business Details`;
+            document.getElementById('bizSubmitBtn').innerText = "Save Changes";
+
+            closeModal('reviewModal');
+            openModal('businessModal');
         }
 
         function openAddProductModal(docId) {
@@ -467,16 +560,30 @@
             renderProducts();
         }
 
+        // Image Carousel Sliding Logic
+        window.slideImage = function(cardId, direction) {
+            const container = document.getElementById(`carousel-${cardId}`);
+            if(!container) return;
+            const totalImages = container.children.length;
+            let currentIndex = parseInt(container.getAttribute('data-index') || 0);
+            
+            currentIndex += direction;
+            if(currentIndex < 0) currentIndex = totalImages - 1;
+            if(currentIndex >= totalImages) currentIndex = 0;
+
+            container.setAttribute('data-index', currentIndex);
+            container.style.transform = `translateX(-${currentIndex * 100}%)`;
+        };
+
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             
             let displayItems = [];
-            marketplaceData.filter(b => b.confirmed).forEach((biz) => {
+            marketplaceData.filter(b => b.confirmed).forEach((biz, bizIdx) => {
                 if(currentFilter === 'All' || biz.category === currentFilter) {
-                    const primaryLogo = (biz.bizImages && biz.bizImages.length > 0) ? biz.bizImages[0] : "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400";
                     biz.products.forEach(prod => {
-                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizLogo: primaryLogo, category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, docId: biz.docId });
+                        displayItems.push({ ...prod, businessName: biz.businessName, businessDescription: biz.businessDescription, bizImages: biz.bizImages || [], category: biz.category, deliveryAvailable: biz.deliveryAvailable, deliveryLocation: biz.deliveryLocation, deliveryCost: biz.deliveryCost, docId: biz.docId, uniqueKey: `${biz.docId}-${prod.id}` });
                     });
                 }
             });
@@ -487,16 +594,31 @@
             }
 
             displayItems.forEach(item => {
+                // Build multiple image slides
+                let imagesHtml = '';
+                item.bizImages.forEach(img => {
+                    imagesHtml += `<img src="${img}" class="w-full h-full object-cover shrink-0">`;
+                });
+                const primaryLogo = item.bizImages.length > 0 ? item.bizImages[0] : "";
+
                 grid.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
                         <div>
-                            <div class="relative h-36 bg-gray-200">
-                                <img src="${item.prodImage}" class="w-full h-full object-cover">
-                                <span class="absolute top-1.5 left-1.5 bg-blue-900 text-white text-[9px] px-2 py-0.5 rounded-full">${item.category}</span>
+                            <!-- Product Image / Business Multiple Images Carousel -->
+                            <div class="relative h-36 bg-gray-200 overflow-hidden">
+                                <div id="carousel-${item.uniqueKey}" data-index="0" class="flex transition-transform duration-300 w-full h-full">
+                                    ${imagesHtml}
+                                    <img src="${item.prodImage}" class="w-full h-full object-cover shrink-0">
+                                </div>
+                                ${item.bizImages.length > 1 ? `
+                                    <button onclick="slideImage('${item.uniqueKey}', -1)" class="absolute left-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full text-[10px]"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button onclick="slideImage('${item.uniqueKey}', 1)" class="absolute right-1 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 rounded-full text-[10px]"><i class="fa-solid fa-chevron-right"></i></button>
+                                ` : ''}
+                                <span class="absolute top-1.5 left-1.5 bg-blue-900 text-white text-[9px] px-2 py-0.5 rounded-full z-10">${item.category}</span>
                             </div>
                             <div class="p-2.5">
                                 <div class="flex items-center space-x-1.5 mb-1">
-                                    <img src="${item.bizLogo}" class="w-4.5 h-4.5 rounded-full object-cover border">
+                                    ${primaryLogo ? `<img src="${primaryLogo}" class="w-4.5 h-4.5 rounded-full object-cover border">` : ''}
                                     <span class="text-[11px] text-gray-700 font-bold">${item.businessName}</span>
                                 </div>
                                 <p class="text-[10px] text-gray-500 mb-1">${item.businessDescription || ''}</p>
@@ -606,6 +728,7 @@
         }
 
         function openReviewModal(docId) {
+            activeReviewDocId = docId;
             const biz = marketplaceData.find(b => b.docId === docId);
             if(!biz) return;
             
@@ -630,10 +753,38 @@
                     <p class="font-semibold text-gray-700 mb-1">Business Gallery Images:</p>
                     <div class="flex gap-2 flex-wrap mb-2">${imagesHtml}</div>
                     <p class="font-semibold text-gray-700 mb-1">Listed Products (${biz.products.length}):</p>
-                    <div class="max-h-28 overflow-y-auto">${productsHtml}</div>
+                    <div class="max-h-28 overflow-y-auto mb-3">${productsHtml}</div>
+                    <button onclick="openEditBusinessModal('${biz.docId}')" class="w-full bg-blue-900 text-white py-1.5 rounded font-semibold text-xs"><i class="fa-solid fa-pen mr-1"></i>Edit Business Information</button>
                 </div>
             `;
             openModal('reviewModal');
+        }
+
+        function openReviewInNewTab() {
+            const biz = marketplaceData.find(b => b.docId === activeReviewDocId);
+            if(!biz) return;
+
+            let newWindow = window.open('', '_blank');
+            let imagesHtml = '';
+            biz.bizImages.forEach(img => { imagesHtml += `<img src="${img}" style="width:100px; height:100px; object-fit:cover; margin-right:5px; border-radius:5px;">`; });
+            let productsHtml = '';
+            biz.products.forEach(p => { productsHtml += `<li>${p.productName} — TZS ${p.price.toLocaleString()}</li>`; });
+
+            newWindow.document.write(`
+                <html>
+                <head><title>${biz.businessName} - Review</title></head>
+                <body style="font-family:sans-serif; padding:20px; color:#333;">
+                    <h1>${biz.businessName}</h1>
+                    <p><strong>Description:</strong> ${biz.businessDescription || 'N/A'}</p>
+                    <p><strong>Category:</strong> ${biz.category}</p>
+                    <p><strong>Delivery:</strong> ${biz.deliveryAvailable ? biz.deliveryLocation + ' (TZS ' + biz.deliveryCost + ')' : 'Not available'}</p>
+                    <h3>Gallery Images</h3>
+                    <div>${imagesHtml}</div>
+                    <h3>Products</h3>
+                    <ul>${productsHtml}</ul>
+                </body>
+                </html>
+            `);
         }
 
         async function confirmBusinessPayment(docId) {
